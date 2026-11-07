@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 2 (Core) - PR 2: Deterministic Zobrist Hashing
-- **Active Branch**: `phase-2-core-zobrist`
-- **Next Step**: Open PR 2, merge to main, then start PR 3 (Position Representation, FEN & Make/Unmake)
+- **Current Phase**: Phase 2 (Core) - PR 3: Position Representation, FEN & Make/Unmake
+- **Active Branch**: `phase-2-core-position`
+- **Next Step**: Open PR 3, merge to main (completes Phase 2), then begin Phase 3 (Move Generation & Perft)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
