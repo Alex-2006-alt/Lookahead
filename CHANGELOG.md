@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Deterministic 64-bit Zobrist hashing with SplitMix64 PRNG in `core/zobrist.h` and `core/zobrist.cpp`.
+- Unit test suite validating Zobrist key uniqueness, determinism, and XOR involution in `engine/tests/core/test_zobrist.cpp`.
 - Strongly typed chess primitives (`Color`, `Piece`, `PieceType`, `Square`, `Rank`, `File`, `CastlingRights`) in `core/types.h`.
 - 64-bit bitboard manipulation and hardware bit primitives in `core/bitboard.h`.
 - Cache-efficient 16-bit compact move encoding with UCI serializer/parser in `core/move.h`.

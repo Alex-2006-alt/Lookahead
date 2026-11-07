@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 2 (Core) - PR 1: Types, Bitboards & 16-bit Move Encoding
-- **Active Branch**: `phase-2-core-types-bitboard`
-- **Next Step**: Open PR 1, merge to main, then start PR 2 (Zobrist Hashing)
+- **Current Phase**: Phase 2 (Core) - PR 2: Deterministic Zobrist Hashing
+- **Active Branch**: `phase-2-core-zobrist`
+- **Next Step**: Open PR 2, merge to main, then start PR 3 (Position Representation, FEN & Make/Unmake)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
