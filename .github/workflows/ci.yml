@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  architecture-check:
+    name: Layer Dependency & Code Style Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Check Architectural Layers & Limits
+        run: |
+          python tools/check_layers.py
+
+  native-build-and-test:
+    name: Native Engine Build & Tests (Linux GCC)
+    runs-on: ubuntu-latest
+    needs: architecture-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++-13
+          python -m pip install --upgrade pip
+          pip install python-chess
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -G Ninja \
+            -DCMAKE_CXX_COMPILER=g++-13 \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DLOOKAHEAD_BUILD_TESTS=ON \
+            engine
+
+      - name: Build Engine & Tests
+        run: |
+          cmake --build build --config Release
+
+      - name: Run Unit Tests
+        run: |
+          ctest --test-dir build --output-on-failure
+
+  sanitizer-checks:
+    name: Clang AddressSanitizer & UBSan
+    runs-on: ubuntu-latest
+    needs: architecture-check
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build clang-17
+          python -m pip install --upgrade pip
+          pip install python-chess
+
+      - name: Configure CMake with Sanitizers
+        run: |
+          cmake -B build-san -G Ninja \
+            -DCMAKE_CXX_COMPILER=clang++-17 \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DLOOKAHEAD_ENABLE_SANITIZERS=ON \
+            -DLOOKAHEAD_BUILD_TESTS=ON \
+            engine
+
+      - name: Build with Sanitizers
+        run: |
+          cmake --build build-san
+
+      - name: Run Sanitized Tests
+        run: |
+          ctest --test-dir build-san --output-on-failure

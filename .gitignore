@@ -1,0 +1,57 @@
+# Build directories and artifacts
+build/
+cmake-build-*/
+out/
+bin/
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+*.pdb
+*.wasm
+*.js.map
+
+# Node / Web dependencies & bundles
+web/node_modules/
+web/dist/
+web/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python caches and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+.pytest_cache/
+
+# IDE and Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Test outputs, traces, and benchmark logs
+prof.raw
+*.gcda
+*.gcno
+*.gcov
+test_results/
+benchmark_results/
+
+# Agent scratch and logs
+.gemini/
+scratch/
