@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Precomputed leaping attack tables (Pawns, Knights, Kings) and Magic Bitboards for sliding pieces (Bishops, Rooks, Queens) in `movegen/attacks.h` and `movegen/attacks.cpp`.
+- Collinear ray `between` and `line` bitboard functions for fast check ray and pin detection.
+- Unit test suite validating leaping/sliding attacks, blocker clipping, and collinear rays in `engine/tests/movegen/test_attacks.cpp`.
 - Complete chess `Position` representation, FEN parser/serializer with strict validation, and O(1) `make_move`/`unmake_move` with incremental Zobrist hashing in `core/position.h` and `core/position.cpp`.
 - Unit test suite validating standard & tricky FEN roundtrips, invalid input rejection, castling, en passant, promotions, and make/unmake move chain fuzz testing in `engine/tests/core/test_position.cpp`.
 - Deterministic 64-bit Zobrist hashing with SplitMix64 PRNG in `core/zobrist.h` and `core/zobrist.cpp`.
