@@ -48,9 +48,30 @@ else()
     message(STATUS "Phase 1: Engine sources not yet created. Skeleton configured.")
 endif()
 
-# Testing options
-option(LOOKAHEAD_BUILD_TESTS "Build Lookahead Unit Tests" OFF)
+# Testing configuration
+option(LOOKAHEAD_BUILD_TESTS "Build Lookahead Unit Tests" ON)
 if(LOOKAHEAD_BUILD_TESTS)
     enable_testing()
-    # GoogleTest integration will be activated in Phase 2
+
+    include(FetchContent)
+    FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+    )
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googletest)
+
+    file(GLOB_RECURSE TEST_SOURCES CONFIGURE_DEPENDS
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp
+    )
+
+    if(TEST_SOURCES)
+        add_executable(lookahead_tests ${TEST_SOURCES})
+        target_include_directories(lookahead_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
+        target_link_libraries(lookahead_tests PRIVATE GTest::gtest_main)
+        if(TARGET lookahead_lib)
+            target_link_libraries(lookahead_tests PRIVATE lookahead_lib)
+        endif()
+        add_test(NAME AllTests COMMAND lookahead_tests)
+    endif()
 endif()
