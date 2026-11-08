@@ -18,6 +18,8 @@ Lookahead is written from scratch. All algorithms and designs are built from pub
    * Donninger, Chrilly. *"Null Move and Deep Search: Clear-Sky Thinking."* ICCA Journal, Vol. 16, No. 3 (1993).
 6. **Late Move Reductions (LMR)**:
    * Heinz, Ernst A. *"Scalable Search in Computer Chess."* Vieweg+Teubner Verlag (2000).
+7. **PeSTO Piece-Square Tables (PSQT) & Tapered Evaluation**:
+   * Michniewski, Tomasz, and Róbert Houdart. *"PeSTO's Piece-Square Tables and Evaluation Function."* Chess Programming Wiki (2014). Provides empirical midgame and endgame material values and 64-entry positional piece tables with non-pawn material phase tapering.
 
 ---
 

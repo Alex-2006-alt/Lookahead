@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Hand-crafted evaluation framework with dual-phase `Score` container and smooth 24-point non-pawn material phase tapering in `eval/evaluate.h` and `eval/evaluate.cpp`.
+- PeSTO material values and 64-square piece-square tables (PSQT) for all piece types with vertical rank mirroring in `eval/material_psqt.h` and `eval/material_psqt.cpp`.
+- `EvalBreakdown` structure capturing component terms for web UI visualization.
+- Diagnostic CLI command `lookahead eval [fen]` providing centipawn evaluation, phase, and material/PSQT breakdowns.
+- Unit test suite verifying starting position evaluation, phase calculations, material dominance, central outposts, and strict mathematical symmetry across diverse positions in `engine/tests/eval/test_evaluate.cpp`.
+- Documented PeSTO evaluation methodology and mathematical symmetry proof in `docs/03-evaluation.md`, `docs/REFERENCES.md`, and `docs/LICENSES.md`.
 - Recursive perft tree enumerator, `perft_divide()` move analyzer, and `run_perft()` throughput benchmark harness in `movegen/perft.h` and `movegen/perft.cpp`.
 - Native executable entry point in `engine/src/main.cpp` supporting `uci`, `perft`, `divide`, and batch move generation (`moves -`).
 - Standard perft dataset `data/perft_positions.epd` covering Initial Position, Kiwipete, and CPW positions 3-6.
