@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 3 (Move Generation & Perft) - PR 2: Legal Move Generation & Game-End Rules
-- **Active Branch**: `phase-3-movegen-legal`
-- **Next Step**: Open PR 5, merge to main, then start PR 6 (Perft Harness, EPD Oracle Suite & Differential Fuzzer)
+- **Current Phase**: Phase 3 (Move Generation & Perft) - PR 3: Perft Harness, EPD Oracle Suite & Differential Fuzzer (Completing Phase 3)
+- **Active Branch**: `phase-3-movegen-perft`
+- **Next Step**: Open PR 6, user merges with merge commit, then start Phase 4 (Evaluation)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Recursive perft tree enumerator, `perft_divide()` move analyzer, and `run_perft()` throughput benchmark harness in `movegen/perft.h` and `movegen/perft.cpp`.
+- Native executable entry point in `engine/src/main.cpp` supporting `uci`, `perft`, `divide`, and batch move generation (`moves -`).
+- Standard perft dataset `data/perft_positions.epd` covering Initial Position, Kiwipete, and CPW positions 3-6.
+- Comprehensive perft test suite with 8 tests across 6 positions and 13M+ nodes in `engine/tests/movegen/test_perft.cpp`.
+- Automated perft benchmark and ground-truth verifier script in `tools/check_perft.py`.
+- Automated differential fuzzer in `tools/compare_movegen.py` verifying 10,000 random positions against `python-chess`.
+- Benchmark empirical measurements and differential fuzzer validation in `docs/RESULTS.md`.
+- Deepened architectural documentation in `docs/02-move-generation-and-perft.md`.
 - Strictly legal move generator with pin detection, king evasions, double check optimization, castling, promotions, and en passant discovered-check edge case handling in `movegen/movegen.h` and `movegen/movegen.cpp`.
 - Stack-allocated `MoveList` container supporting up to 256 moves with zero dynamic allocations on the search stack.
 - Game-end rule evaluators: `is_checkmate`, `is_stalemate`, `is_fifty_move_rule`, and `is_insufficient_material`.
