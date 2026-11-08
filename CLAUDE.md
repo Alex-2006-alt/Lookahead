@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 3 (Move Generation & Perft) - PR 3: Perft Harness, EPD Oracle Suite & Differential Fuzzer (Completing Phase 3)
-- **Active Branch**: `phase-3-movegen-perft`
-- **Next Step**: Open PR 6, user merges with merge commit, then start Phase 4 (Evaluation)
+- **Current Phase**: Phase 4 (Evaluation) - PR 1: Tapered Scoring, PeSTO Material & PSQT
+- **Active Branch**: `phase-4-eval-material-psqt`
+- **Next Step**: User reviews & merges PR 7, then start PR 2 (Positional Terms: Pawn Structure, King Safety & Mobility)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`

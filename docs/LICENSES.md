@@ -12,6 +12,10 @@ All third-party libraries, test oracles, and fonts used in Lookahead are recorde
 * **GoogleTest**:
   * Purpose: Native unit test harness.
   * License: BSD 3-Clause License.
+* **PeSTO Evaluation Parameters & Piece-Square Tables**:
+  * Authors: Tomasz Michniewski, Róbert Houdart.
+  * Purpose: Midgame and endgame material values and positional piece-square tables.
+  * License: Public Domain / Permissive Open Chess Reference (Chess Programming Wiki).
 
 ---
 

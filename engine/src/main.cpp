@@ -12,6 +12,7 @@
 #include "movegen/attacks.h"
 #include "movegen/movegen.h"
 #include "movegen/perft.h"
+#include "eval/evaluate.h"
 
 using namespace lookahead;
 
@@ -115,6 +116,31 @@ int main(int argc, char* argv[]) {
             std::cout << list[i].to_uci();
         }
         std::cout << "\n";
+        return 0;
+    }
+
+    if (command == "eval") {
+        std::string fen = std::string(core::Position::START_FEN);
+        if (argc >= 3) {
+            fen = argv[2];
+            for (int i = 3; i < argc; ++i) {
+                fen += " ";
+                fen += argv[i];
+            }
+        }
+
+        core::Position pos;
+        if (!pos.set_fen(fen)) {
+            std::cerr << "Invalid FEN: " << fen << "\n";
+            return 1;
+        }
+
+        eval::EvalBreakdown bd;
+        const int score = eval::evaluate_detailed(pos, bd);
+        std::cout << "Evaluation (stm): " << score << " cp\n";
+        std::cout << "Game Phase:       " << bd.game_phase << " / " << eval::TOTAL_PHASE << "\n";
+        std::cout << "Material (mg/eg): " << bd.material.mg << " / " << bd.material.eg << " cp\n";
+        std::cout << "PSQT (mg/eg):     " << bd.psqt.mg << " / " << bd.psqt.eg << " cp\n";
         return 0;
     }
 
