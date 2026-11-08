@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Strictly legal move generator with pin detection, king evasions, double check optimization, castling, promotions, and en passant discovered-check edge case handling in `movegen/movegen.h` and `movegen/movegen.cpp`.
+- Stack-allocated `MoveList` container supporting up to 256 moves with zero dynamic allocations on the search stack.
+- Game-end rule evaluators: `is_checkmate`, `is_stalemate`, `is_fifty_move_rule`, and `is_insufficient_material`.
+- Unit test suite verifying initial move counts, absolute pins, double check restrictions, castling legality, en passant discovered check prune, checkmate, and stalemate in `engine/tests/movegen/test_movegen.cpp`.
 - Precomputed leaping attack tables (Pawns, Knights, Kings) and Magic Bitboards for sliding pieces (Bishops, Rooks, Queens) in `movegen/attacks.h` and `movegen/attacks.cpp`.
 - Collinear ray `between` and `line` bitboard functions for fast check ray and pin detection.
 - Unit test suite validating leaping/sliding attacks, blocker clipping, and collinear rays in `engine/tests/movegen/test_attacks.cpp`.
