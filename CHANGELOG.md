@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Independent search feature toggles framework in `search/features.h` for clean heuristic ablation testing.
+- Fixed-size Transposition Table with full 64-bit Zobrist collision protection, generation aging, depth replacement, and ply-adjusted mate scores in `search/transposition_table.h` and `search/transposition_table.cpp`.
+- Quiescence search with stand-pat cutoff, delta pruning, and MVV-LVA capture ordering in `search/quiescence.h` and `search/quiescence.cpp`.
+- Iterative deepening negamax alpha-beta search framework in `search/search.h` and `search/search.cpp`.
+- Diagnostic CLI command `lookahead search <depth> [fen]` reporting bestmove, score, nodes, and NPS.
+- Unit test suite in `engine/tests/search/test_search.cpp` verifying TT caching, mate score adjustment, quiescence cutoffs, and Scholar's Mate / Back-rank mate detection.
+- Comprehensive search documentation in `docs/04-search-alpha-beta.md`.
 - Positional pawn structure evaluator covering doubled, isolated, passed (rank-scaled), and connected pawns in `eval/pawn_structure.h` and `eval/pawn_structure.cpp`.
 - King safety evaluation modeling castled pawn shelter, open/semi-open file exposure, and progressive virtual enemy attack units in `eval/king_safety.h` and `eval/king_safety.cpp`.
 - Piece mobility evaluator measuring safe reachable destinations outside opposing pawn attack control for knights, bishops, rooks, and queens in `eval/mobility.h` and `eval/mobility.cpp`.

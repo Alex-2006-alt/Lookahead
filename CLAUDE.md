@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 4 (Evaluation) - PR 2: Positional Terms (Pawn Structure, King Safety & Mobility) [Completing Phase 4]
-- **Active Branch**: `phase-4-eval-positional-terms`
-- **Next Step**: User reviews & merges PR 8, then start Phase 5 (Negamax Alpha-Beta Search & Pruning)
+- **Current Phase**: Phase 5 (Search) - PR 1: Core Alpha-Beta Framework, TT & Quiescence
+- **Active Branch**: `phase-5-search-tt-quiescence`
+- **Next Step**: User reviews & merges PR 9, then start PR 2 (Move Ordering: TT Move, MVV-LVA, Killers & History)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
