@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 4 (Evaluation) - PR 1: Tapered Scoring, PeSTO Material & PSQT
-- **Active Branch**: `phase-4-eval-material-psqt`
-- **Next Step**: User reviews & merges PR 7, then start PR 2 (Positional Terms: Pawn Structure, King Safety & Mobility)
+- **Current Phase**: Phase 4 (Evaluation) - PR 2: Positional Terms (Pawn Structure, King Safety & Mobility) [Completing Phase 4]
+- **Active Branch**: `phase-4-eval-positional-terms`
+- **Next Step**: User reviews & merges PR 8, then start Phase 5 (Negamax Alpha-Beta Search & Pruning)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
