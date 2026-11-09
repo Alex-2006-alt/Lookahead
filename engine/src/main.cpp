@@ -141,6 +141,9 @@ int main(int argc, char* argv[]) {
         std::cout << "Game Phase:       " << bd.game_phase << " / " << eval::TOTAL_PHASE << "\n";
         std::cout << "Material (mg/eg): " << bd.material.mg << " / " << bd.material.eg << " cp\n";
         std::cout << "PSQT (mg/eg):     " << bd.psqt.mg << " / " << bd.psqt.eg << " cp\n";
+        std::cout << "Pawns (mg/eg):    " << bd.pawns.mg << " / " << bd.pawns.eg << " cp\n";
+        std::cout << "Safety (mg/eg):   " << bd.king_safety.mg << " / " << bd.king_safety.eg << " cp\n";
+        std::cout << "Mobility (mg/eg): " << bd.mobility.mg << " / " << bd.mobility.eg << " cp\n";
         return 0;
     }
 

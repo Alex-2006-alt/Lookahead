@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Positional pawn structure evaluator covering doubled, isolated, passed (rank-scaled), and connected pawns in `eval/pawn_structure.h` and `eval/pawn_structure.cpp`.
+- King safety evaluation modeling castled pawn shelter, open/semi-open file exposure, and progressive virtual enemy attack units in `eval/king_safety.h` and `eval/king_safety.cpp`.
+- Piece mobility evaluator measuring safe reachable destinations outside opposing pawn attack control for knights, bishops, rooks, and queens in `eval/mobility.h` and `eval/mobility.cpp`.
+- Integrated positional terms into root `evaluate()`, `evaluate_detailed()`, and `lookahead eval` CLI reporting.
+- Expanded evaluation test suite to 61 GoogleTests verifying doubled pawns, isolated pawns, passed pawns, king shelter, piece mobility, and term-by-term symmetry in `engine/tests/eval/test_evaluate.cpp`.
+- Comprehensive documentation of positional evaluation terms and mathematical formulations in `docs/03-evaluation.md`.
 - Hand-crafted evaluation framework with dual-phase `Score` container and smooth 24-point non-pawn material phase tapering in `eval/evaluate.h` and `eval/evaluate.cpp`.
 - PeSTO material values and 64-square piece-square tables (PSQT) for all piece types with vertical rank mirroring in `eval/material_psqt.h` and `eval/material_psqt.cpp`.
 - `EvalBreakdown` structure capturing component terms for web UI visualization.
