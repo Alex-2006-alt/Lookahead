@@ -13,12 +13,15 @@
 #include "movegen/movegen.h"
 #include "movegen/perft.h"
 #include "eval/evaluate.h"
+#include "search/search.h"
+#include "search/transposition_table.h"
 
 using namespace lookahead;
 
 int main(int argc, char* argv[]) {
     // Initialize attack lookup tables once at startup
     movegen::attacks::init();
+    search::global_tt.resize(16);
 
     if (argc < 2) {
         std::cout << "id name " << core::ENGINE_NAME << " " << core::ENGINE_VERSION << "\n";
@@ -144,6 +147,33 @@ int main(int argc, char* argv[]) {
         std::cout << "Pawns (mg/eg):    " << bd.pawns.mg << " / " << bd.pawns.eg << " cp\n";
         std::cout << "Safety (mg/eg):   " << bd.king_safety.mg << " / " << bd.king_safety.eg << " cp\n";
         std::cout << "Mobility (mg/eg): " << bd.mobility.mg << " / " << bd.mobility.eg << " cp\n";
+        return 0;
+    }
+
+    if (command == "search" || command == "go") {
+        int depth = 5;
+        if (argc >= 3) {
+            depth = std::stoi(argv[2]);
+        }
+        std::string fen = std::string(core::Position::START_FEN);
+        if (argc >= 4) {
+            fen = argv[3];
+            for (int i = 4; i < argc; ++i) {
+                fen += " ";
+                fen += argv[i];
+            }
+        }
+        core::Position pos;
+        if (!pos.set_fen(fen)) {
+            std::cerr << "Invalid FEN: " << fen << "\n";
+            return 1;
+        }
+        search::SearchLimits limits;
+        limits.depth = depth;
+        const auto res = search::search(pos, limits);
+        std::cout << "bestmove " << res.best_move.to_uci() << "\n";
+        std::cout << "info depth " << res.depth_reached << " score cp " << res.score
+                  << " nodes " << res.nodes << " nps " << static_cast<uint64_t>(res.nps) << "\n";
         return 0;
     }
 

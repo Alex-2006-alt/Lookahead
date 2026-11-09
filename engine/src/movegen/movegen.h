@@ -23,6 +23,7 @@ public:
     [[nodiscard]] size_t size() const noexcept { return size_; }
     [[nodiscard]] bool empty() const noexcept { return size_ == 0; }
     [[nodiscard]] core::Move operator[](size_t idx) const noexcept { return moves_[idx]; }
+    [[nodiscard]] core::Move& operator[](size_t idx) noexcept { return moves_[idx]; }
     [[nodiscard]] core::Move* begin() noexcept { return moves_.data(); }
     [[nodiscard]] core::Move* end() noexcept { return moves_.data() + size_; }
     [[nodiscard]] const core::Move* begin() const noexcept { return moves_.data(); }
