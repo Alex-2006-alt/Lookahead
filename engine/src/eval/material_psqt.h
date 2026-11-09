@@ -24,6 +24,7 @@ struct Score {
 
     constexpr Score operator+(const Score& o) const noexcept { return Score(mg + o.mg, eg + o.eg); }
     constexpr Score operator-(const Score& o) const noexcept { return Score(mg - o.mg, eg - o.eg); }
+    constexpr Score operator*(int32_t factor) const noexcept { return Score(mg * factor, eg * factor); }
     constexpr Score& operator+=(const Score& o) noexcept { mg += o.mg; eg += o.eg; return *this; }
     constexpr Score& operator-=(const Score& o) noexcept { mg -= o.mg; eg -= o.eg; return *this; }
     constexpr Score operator-() const noexcept { return Score(-mg, -eg); }

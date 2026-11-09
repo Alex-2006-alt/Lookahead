@@ -39,6 +39,16 @@ inline constexpr Bitboard Rank6BB = Rank1BB << 40;
 inline constexpr Bitboard Rank7BB = Rank1BB << 48;
 inline constexpr Bitboard Rank8BB = Rank1BB << 56;
 
+// Converts a file to an entire column bitboard.
+[[nodiscard]] constexpr Bitboard file_bb(File f) noexcept {
+    return FileABB << static_cast<uint8_t>(f);
+}
+
+// Converts a rank to an entire row bitboard.
+[[nodiscard]] constexpr Bitboard rank_bb(Rank r) noexcept {
+    return Rank1BB << (8 * static_cast<uint8_t>(r));
+}
+
 // Converts a square to a single-bit bitboard.
 [[nodiscard]] constexpr Bitboard square_bb(Square sq) noexcept {
     return 1ULL << static_cast<uint8_t>(sq);

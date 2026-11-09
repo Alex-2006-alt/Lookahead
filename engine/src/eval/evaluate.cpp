@@ -1,10 +1,13 @@
 /*
  * What: Implementation of root evaluation aggregation and phase tapering.
  * Why:  Combines material, piece-square tables, and positional terms into a single score.
- * Layer: Layer 2 (eval) - depends only on evaluate.h and material_psqt.h.
+ * Layer: Layer 2 (eval) - depends only on evaluate.h and eval components.
  */
 
 #include "evaluate.h"
+#include "pawn_structure.h"
+#include "king_safety.h"
+#include "mobility.h"
 
 namespace lookahead::eval {
 
@@ -16,10 +19,10 @@ int evaluate_detailed(const core::Position& pos, EvalBreakdown& breakdown) noexc
     breakdown.material = mat;
     breakdown.psqt = psqt;
 
-    // Remaining positional terms default to zero until Sub-PR 4.2 integration
-    breakdown.pawns = Score{0, 0};
-    breakdown.king_safety = Score{0, 0};
-    breakdown.mobility = Score{0, 0};
+    // Positional terms
+    breakdown.pawns = evaluate_pawn_structure(pos);
+    breakdown.king_safety = evaluate_king_safety(pos);
+    breakdown.mobility = evaluate_mobility(pos);
 
     // Total score from White's perspective
     const Score white_total = breakdown.material + breakdown.psqt +
