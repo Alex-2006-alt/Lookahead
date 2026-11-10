@@ -1,3 +1,16 @@
-# Lookahead Mate Puzzles
-# Format: <FEN> ;bm <best_move> ;id <description>
-r1bqkb1r/pppp1ppp/2n5/4p3/2B1n3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 4 ;bm Bxf7+ ;id "Opera Trap Setup"
+# EPD benchmark puzzle suite for Lookahead chess engine
+# Format: <FEN> bm <bestmove>; id "<puzzle_id>";
+
+# Mate in 1 puzzles
+r1bqkb1r/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1 bm h5f7; id "mate_1_scholars";
+6k1/5ppp/8/8/8/8/8/4R1K1 w - - 0 1 bm e1e8; id "mate_1_back_rank";
+rnbqkbnr/ppppp2p/5p2/6p1/4P3/3P4/PPP2PPP/RNBQKBNR w KQkq - 0 1 bm d1h5; id "mate_1_fools";
+k7/8/1K6/8/8/8/8/7R w - - 0 1 bm h1h8; id "mate_1_corner_rook";
+
+# Mate in 2 puzzles
+4kb1r/p2n1ppp/4q3/4p1B1/4P3/1Q6/PPP2PPP/2KR4 w k - 0 1 bm b3b8; id "mate_2_morphy_opera";
+3r2k1/5ppp/8/8/8/8/4QPPP/4R1K1 w - - 0 1 bm e2e8; id "mate_2_queen_sac";
+6k1/4Rppp/8/8/8/8/1r3PPP/4R1K1 w - - 0 1 bm e7e8; id "mate_2_double_rook";
+
+# Mate in 3 puzzles
+5rk1/1pp3pp/p5N1/7Q/8/8/PPP2PPP/3R3K w - - 1 2 bm h5d5; id "mate_3_knight_queen";

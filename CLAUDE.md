@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 5 (Search) - PR 2: Move Ordering (TT Move, MVV-LVA, Killers & History)
-- **Active Branch**: `phase-5-search-move-ordering`
-- **Next Step**: User reviews & merges PR 10, then start PR 3 (Pruning, Reductions, Time Manager, Trace & Mate Puzzles)
+- **Current Phase**: Phase 5 (Search) - PR 3: Pruning, Reductions, Time Manager & Mate Puzzles [Completing Phase 5]
+- **Active Branch**: `phase-5-search-pruning-time`
+- **Next Step**: User reviews & merges PR 11, then start Phase 6 (UCI Protocol Implementation)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`

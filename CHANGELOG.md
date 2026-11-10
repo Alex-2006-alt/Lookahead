@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Search forward pruning and reduction heuristics in `search/pruning.h` and `search/pruning.cpp` (Reverse Futility Pruning, Null-Move Pruning with zugzwang guard, and Late Move Reductions with check exemptions).
+- Tournament time manager and periodic node-based execution abort controller in `search/time_manager.h` and `search/time_manager.cpp`.
+- Triangular PV table (`PVTable`) and streaming telemetry callback (`SearchCallback`) in `search/search.h` and `search/search.cpp`.
+- Aspiration window search around iterative deepening evaluations.
+- Curated benchmark suite of classic tactical mates (mate in 1, 2, and 3) in `data/mate_puzzles.epd`.
+- Comprehensive unit test suite in `engine/tests/search/test_pruning_time.cpp` verifying pruning conditions, time limits, streaming progress, and 100% solver pass rate on EPD puzzles.
 - Dynamic move ordering hierarchy with TT move, MVV-LVA captures, pawn promotions, killer moves, and butterfly history heuristic in `search/move_ordering.h` and `search/move_ordering.cpp`.
 - Lazy in-place selection sorting (`pick_next_move`) eliminating heap allocations and optimizing early beta-cutoff branch exploration.
 - Integrated killer moves table (2 quiet moves per ply) and history table (weighted by $\text{depth}^2$ with dynamic saturation aging) into the core negamax search loop.
