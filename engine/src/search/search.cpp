@@ -9,6 +9,7 @@
 #include "features.h"
 #include "transposition_table.h"
 #include "quiescence.h"
+#include "move_ordering.h"
 #include "movegen/movegen.h"
 
 namespace lookahead::search {
@@ -16,7 +17,8 @@ namespace lookahead::search {
 namespace {
 
 int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
-            uint64_t& nodes, core::Move& pv_move) noexcept {
+            uint64_t& nodes, core::Move& pv_move,
+            KillerTable& killers, HistoryTable& history) noexcept {
     ++nodes;
 
     // Quiescence search at leaf nodes
@@ -59,8 +61,11 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
         return 0; // Stalemate
     }
 
-    // Place TT move first if available for immediate beta cutoffs
-    if (!tt_move.is_null()) {
+    std::array<int, movegen::MoveList::MAX_CAPACITY> scores{};
+    if (active_features.use_move_ordering) {
+        score_moves(pos, moves, tt_move, killers, history, ply, scores);
+    } else if (!tt_move.is_null()) {
+        // Fallback: prioritize TT move only when general move ordering is toggled off
         for (size_t i = 0; i < moves.size(); ++i) {
             if (moves[i] == tt_move) {
                 std::swap(moves[0], moves[i]);
@@ -75,11 +80,16 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
     core::UndoInfo undo;
 
     for (size_t i = 0; i < moves.size(); ++i) {
+        if (active_features.use_move_ordering) {
+            pick_next_move(moves, scores, i);
+        }
+
         const core::Move m = moves[i];
         pos.make_move(m, undo);
 
         core::Move child_pv{};
-        const int score = -negamax(pos, depth - 1, ply + 1, -beta, -alpha, nodes, child_pv);
+        const int score = -negamax(pos, depth - 1, ply + 1, -beta, -alpha, nodes, child_pv,
+                                   killers, history);
         pos.unmake_move(m, undo);
 
         if (score > best_score) {
@@ -91,6 +101,11 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
             pv_move = m;
         }
         if (alpha >= beta) {
+            // Beta cutoff: update killer and history heuristics for quiet non-promotion moves
+            if (active_features.use_move_ordering && !m.is_capture() && !m.is_promotion()) {
+                killers.store(ply, m);
+                history.record(pos.side_to_move(), m.from_square(), m.to_square(), depth);
+            }
             break; // Beta cutoff
         }
     }
@@ -118,11 +133,16 @@ SearchResult search(core::Position& pos, const SearchLimits& limits) {
     const int max_d = (limits.depth > 0) ? limits.depth : 6;
     global_tt.advance_generation();
 
+    KillerTable killers;
+    HistoryTable history;
+    killers.clear();
+    history.clear();
+
     // Iterative deepening loop
     for (int current_depth = 1; current_depth <= max_d; ++current_depth) {
         core::Move root_pv{};
         const int score = negamax(pos, current_depth, 0, -SCORE_INFINITY, SCORE_INFINITY,
-                                  result.nodes, root_pv);
+                                  result.nodes, root_pv, killers, history);
 
         if (!root_pv.is_null()) {
             result.best_move = root_pv;

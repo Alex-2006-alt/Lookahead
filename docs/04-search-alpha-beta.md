@@ -12,6 +12,7 @@ $$\text{core (0)} \leftarrow \text{movegen (1)} \leftarrow \text{eval (2)} \left
 * [`features.h`](file:///engine/src/search/features.h): Algorithmic feature toggles (`USE_TT`, `USE_QUIESCENCE`, etc.) for clean ablation testing.
 * [`transposition_table.h`](file:///engine/src/search/transposition_table.h) / [`transposition_table.cpp`](file:///engine/src/search/transposition_table.cpp): 64-bit Zobrist keyed hash table with exact, lower-bound, and upper-bound flags.
 * [`quiescence.h`](file:///engine/src/search/quiescence.h) / [`quiescence.cpp`](file:///engine/src/search/quiescence.cpp): Stand-pat capture search with MVV-LVA move ordering and delta pruning.
+* [`move_ordering.h`](file:///engine/src/search/move_ordering.h) / [`move_ordering.cpp`](file:///engine/src/search/move_ordering.cpp): Move prioritization hierarchy (TT move, MVV-LVA, killers, history) and selection sorting.
 * [`search.h`](file:///engine/src/search/search.h) / [`search.cpp`](file:///engine/src/search/search.cpp): Iterative deepening controller and negamax alpha-beta recursion.
 
 ---
@@ -54,3 +55,25 @@ To eliminate the **horizon effect** (where a disastrous piece loss is pushed jus
 3. **MVV-LVA Capture Ordering**: Captures are sorted by Most Valuable Victim - Least Valuable Attacker:
    $$\text{priority} = \text{victim\_val} \times 10 - \text{attacker\_val}$$
    Ensuring $P \times Q$ is explored before $Q \times P$.
+
+---
+
+## 5. Move Ordering Hierarchy
+
+Alpha-beta pruning efficiency is asymptotically optimal when the best move is explored first, reducing effective branching factor from $b$ towards $\sqrt{b}$. Lookahead organizes move evaluation into a strict 6-tier prioritization ladder:
+
+| Tier | Heuristic | Score Range | Description |
+| :--- | :--- | :--- | :--- |
+| **1** | **Transposition Table (PV)** | `2,000,000` | Best move from shallower iteration or previous subtree search |
+| **2** | **MVV-LVA Captures** | `1,000,000 - 1,050,000` | Winning and equal captures ranked by victim value minus attacker value |
+| **3** | **Promotions** | `900,000 - 950,000` | Pawn promotions ranked by resulting piece type |
+| **4** | **Killer 1** | `800,000` | Most recent quiet move causing a $\beta$-cutoff at this search ply |
+| **5** | **Killer 2** | `700,000` | Secondary quiet move causing a $\beta$-cutoff at this search ply |
+| **6** | **History Heuristic** | `0 - 50,000` | Butterfly table `history[color][from][to]` incremented by $\text{depth}^2$ on cutoffs |
+
+### Lazy Selection Sorting (`pick_next_move`)
+Rather than sorting all $N$ legal moves upfront with an expensive $O(N \log N)$ algorithm, Lookahead employs in-place selection sort:
+- Scores are pre-computed into a stack-allocated buffer (`std::array<int, 256>`).
+- On step $i$, the move with the maximum score in $[i, N)$ is swapped into index $i$.
+- If a $\beta$-cutoff occurs on move 0 or move 1 (true in over 80% of chess tree positions), the remaining moves are never sorted or swapped, achieving maximum speed and zero dynamic allocations.
+

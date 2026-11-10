@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Dynamic move ordering hierarchy with TT move, MVV-LVA captures, pawn promotions, killer moves, and butterfly history heuristic in `search/move_ordering.h` and `search/move_ordering.cpp`.
+- Lazy in-place selection sorting (`pick_next_move`) eliminating heap allocations and optimizing early beta-cutoff branch exploration.
+- Integrated killer moves table (2 quiet moves per ply) and history table (weighted by $\text{depth}^2$ with dynamic saturation aging) into the core negamax search loop.
+- Dedicated unit test suite in `engine/tests/search/test_move_ordering.cpp` verifying TT priority, MVV-LVA victim-attacker ordering, killer precedence, history accumulation, and search node reductions.
 - Independent search feature toggles framework in `search/features.h` for clean heuristic ablation testing.
 - Fixed-size Transposition Table with full 64-bit Zobrist collision protection, generation aging, depth replacement, and ply-adjusted mate scores in `search/transposition_table.h` and `search/transposition_table.cpp`.
 - Quiescence search with stand-pat cutoff, delta pruning, and MVV-LVA capture ordering in `search/quiescence.h` and `search/quiescence.cpp`.

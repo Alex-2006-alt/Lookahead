@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 5 (Search) - PR 1: Core Alpha-Beta Framework, TT & Quiescence
-- **Active Branch**: `phase-5-search-tt-quiescence`
-- **Next Step**: User reviews & merges PR 9, then start PR 2 (Move Ordering: TT Move, MVV-LVA, Killers & History)
+- **Current Phase**: Phase 5 (Search) - PR 2: Move Ordering (TT Move, MVV-LVA, Killers & History)
+- **Active Branch**: `phase-5-search-move-ordering`
+- **Next Step**: User reviews & merges PR 10, then start PR 3 (Pruning, Reductions, Time Manager, Trace & Mate Puzzles)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
