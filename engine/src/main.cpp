@@ -171,9 +171,15 @@ int main(int argc, char* argv[]) {
         search::SearchLimits limits;
         limits.depth = depth;
         const auto res = search::search(pos, limits);
+        if (!res.pv_string.empty()) {
+            std::cout << "info depth " << res.depth_reached << " score cp " << res.score
+                      << " nodes " << res.nodes << " nps " << static_cast<uint64_t>(res.nps)
+                      << " pv " << res.pv_string << "\n";
+        } else {
+            std::cout << "info depth " << res.depth_reached << " score cp " << res.score
+                      << " nodes " << res.nodes << " nps " << static_cast<uint64_t>(res.nps) << "\n";
+        }
         std::cout << "bestmove " << res.best_move.to_uci() << "\n";
-        std::cout << "info depth " << res.depth_reached << " score cp " << res.score
-                  << " nodes " << res.nodes << " nps " << static_cast<uint64_t>(res.nps) << "\n";
         return 0;
     }
 

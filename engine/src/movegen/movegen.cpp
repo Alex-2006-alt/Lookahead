@@ -92,6 +92,7 @@ void generate_legal_moves(const core::Position& pos, MoveList& list) noexcept {
     }
 
     // 3. Target squares for non-king moves (intercept ray or capture checker)
+    const core::Bitboard non_king_them = ~pos.pieces(them, core::PieceType::King);
     const core::Bitboard check_mask = (num_checkers == 1)
         ? (checkers | attacks::between(k_sq, core::lsb(checkers)))
         : core::BitboardAll;
@@ -123,7 +124,7 @@ void generate_legal_moves(const core::Position& pos, MoveList& list) noexcept {
         }
 
         // Diagonal pawn captures
-        core::Bitboard cap_targets = attacks::pawn(us, from) & pos.pieces(them) & check_mask & pin_line;
+        core::Bitboard cap_targets = attacks::pawn(us, from) & pos.pieces(them) & non_king_them & check_mask & pin_line;
         while (cap_targets != 0ULL) {
             const core::Square to = core::pop_lsb(cap_targets);
             add_pawn_moves(from, to, MoveFlag::Capture, list);
@@ -151,7 +152,7 @@ void generate_legal_moves(const core::Position& pos, MoveList& list) noexcept {
     core::Bitboard knights = pos.pieces(us, core::PieceType::Knight) & ~pinned_bb;
     while (knights != 0ULL) {
         const core::Square from = core::pop_lsb(knights);
-        core::Bitboard targets = attacks::knight(from) & ~pos.pieces(us) & check_mask;
+        core::Bitboard targets = attacks::knight(from) & ~pos.pieces(us) & non_king_them & check_mask;
         while (targets != 0ULL) {
             const core::Square to = core::pop_lsb(targets);
             const MoveFlag flag = (pos.piece_at(to) != core::Piece::None) ? MoveFlag::Capture : MoveFlag::Quiet;
@@ -168,7 +169,7 @@ void generate_legal_moves(const core::Position& pos, MoveList& list) noexcept {
             core::Bitboard targets = 0ULL;
             if (is_diag) targets |= attacks::bishop(from, pos.occupied());
             if (is_orth) targets |= attacks::rook(from, pos.occupied());
-            targets &= ~pos.pieces(us) & check_mask & pin_line;
+            targets &= ~pos.pieces(us) & non_king_them & check_mask & pin_line;
             while (targets != 0ULL) {
                 const core::Square to = core::pop_lsb(targets);
                 const MoveFlag flag = (pos.piece_at(to) != core::Piece::None) ? MoveFlag::Capture : MoveFlag::Quiet;

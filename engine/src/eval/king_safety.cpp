@@ -14,8 +14,10 @@ namespace {
 
 // Evaluates king shelter, pawn shield, and file exposure for one side.
 [[nodiscard]] Score evaluate_shelter(const core::Position& pos, core::Color us) noexcept {
+    const core::Bitboard king_bb = pos.pieces(us, core::PieceType::King);
+    if (king_bb == 0ULL) return Score{0, 0};
     Score score{0, 0};
-    const core::Square king_sq = core::lsb(pos.pieces(us, core::PieceType::King));
+    const core::Square king_sq = core::lsb(king_bb);
     const int k_file = static_cast<int>(core::file_of(king_sq));
     const int k_rank = static_cast<int>(core::rank_of(king_sq));
 
@@ -67,8 +69,10 @@ namespace {
 
 // Evaluates virtual enemy attack pressure focused on the king ring.
 [[nodiscard]] Score evaluate_attack_units(const core::Position& pos, core::Color us) noexcept {
+    const core::Bitboard king_bb = pos.pieces(us, core::PieceType::King);
+    if (king_bb == 0ULL) return Score{0, 0};
     const core::Color them = ~us;
-    const core::Square king_sq = core::lsb(pos.pieces(us, core::PieceType::King));
+    const core::Square king_sq = core::lsb(king_bb);
     const core::Bitboard king_ring = movegen::attacks::king(king_sq) | core::square_bb(king_sq);
     const core::Bitboard occ = pos.occupied();
 
