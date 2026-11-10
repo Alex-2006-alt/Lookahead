@@ -7,35 +7,11 @@
 #include "quiescence.h"
 #include <algorithm>
 #include "features.h"
+#include "move_ordering.h"
 #include "eval/evaluate.h"
 #include "movegen/movegen.h"
 
 namespace lookahead::search {
-
-namespace {
-
-// MVV-LVA victim values (Pawn=100, Knight=300, Bishop=300, Rook=500, Queen=900, King=0).
-inline constexpr std::array<int, 7> VICTIM_SCORES = {0, 100, 300, 300, 500, 900, 0};
-
-// Computes Most Valuable Victim - Least Valuable Attacker (MVV-LVA) sort key.
-[[nodiscard]] int mvv_lva_score(const core::Position& pos, core::Move m) noexcept {
-    const core::Piece captured = pos.piece_at(m.to_square());
-    const core::PieceType victim_pt = (captured != core::Piece::None)
-                                          ? core::type_of(captured)
-                                          : (m.is_en_passant() ? core::PieceType::Pawn : core::PieceType::None);
-
-    const core::Piece moving = pos.piece_at(m.from_square());
-    const core::PieceType attacker_pt = core::type_of(moving);
-
-    const int victim_val = VICTIM_SCORES[static_cast<size_t>(victim_pt)];
-    const int attacker_val = static_cast<int>(attacker_pt);
-
-    int score = victim_val * 10 - attacker_val;
-    if (m.is_promotion()) score += 800;
-    return score;
-}
-
-}  // namespace
 
 int quiescence(core::Position& pos, int alpha, int beta, uint64_t& nodes) noexcept {
     ++nodes;

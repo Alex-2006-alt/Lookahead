@@ -19,6 +19,8 @@ namespace lookahead::movegen {
 // Stack-allocated container holding up to 256 moves with zero dynamic allocations.
 class MoveList {
 public:
+    static constexpr size_t MAX_CAPACITY = 256;
+
     void push_back(core::Move m) noexcept { moves_[size_++] = m; }
     [[nodiscard]] size_t size() const noexcept { return size_; }
     [[nodiscard]] bool empty() const noexcept { return size_ == 0; }
