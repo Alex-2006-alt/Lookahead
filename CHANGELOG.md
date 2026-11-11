@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Layer 4 interface module implementing Universal Chess Interface (UCI) protocol interpreter in `interface/uci.h` and `interface/uci.cpp`.
+- Stream dependency injection (`std::istream& in`, `std::ostream& out`) enabling deterministic, in-process UCI unit testing without OS subprocess piping.
+- Full UCI handshake (`uci`, `isready`, `ucinewgame`), board position setup (`startpos`, `fen`, `moves`), dynamic option configuration (`Hash`, `Clear Hash`), and search dispatch (`go` limits).
+- Streaming UCI `info` telemetry lines (depth, score cp, nodes, nps, elapsed time, pv) and `bestmove` emission.
+- Dual-mode CLI entry point in `engine/src/main.cpp` supporting interactive UCI mode as default while preserving diagnostic CLI commands (`perft`, `divide`, `moves`, `eval`, `search`).
+- Unit test suite in `engine/tests/interface/test_uci.cpp` verifying UCI handshake, options, board configuration, and search execution.
+- Comprehensive UCI protocol architectural documentation in `docs/06-uci-protocol.md`.
 - Search forward pruning and reduction heuristics in `search/pruning.h` and `search/pruning.cpp` (Reverse Futility Pruning, Null-Move Pruning with zugzwang guard, and Late Move Reductions with check exemptions).
 - Tournament time manager and periodic node-based execution abort controller in `search/time_manager.h` and `search/time_manager.cpp`.
 - Triangular PV table (`PVTable`) and streaming telemetry callback (`SearchCallback`) in `search/search.h` and `search/search.cpp`.
