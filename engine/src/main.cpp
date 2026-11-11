@@ -15,6 +15,7 @@
 #include "eval/evaluate.h"
 #include "search/search.h"
 #include "search/transposition_table.h"
+#include "interface/uci.h"
 
 using namespace lookahead;
 
@@ -23,21 +24,16 @@ int main(int argc, char* argv[]) {
     movegen::attacks::init();
     search::global_tt.resize(16);
 
-    if (argc < 2) {
-        std::cout << "id name " << core::ENGINE_NAME << " " << core::ENGINE_VERSION << "\n";
-        std::cout << "id author " << core::ENGINE_AUTHOR << "\n";
-        std::cout << "Usage: lookahead [uci | perft <depth> [fen] | divide <depth> [fen] | moves [fen | -]]\n";
+    if (argc < 2 || std::string_view(argv[1]) == "uci") {
+        interface::UciHandler uci;
+        if (argc >= 2 && std::string_view(argv[1]) == "uci") {
+            uci.handle_command("uci");
+        }
+        uci.loop();
         return 0;
     }
 
     const std::string command = argv[1];
-
-    if (command == "uci") {
-        std::cout << "id name " << core::ENGINE_NAME << " " << core::ENGINE_VERSION << "\n";
-        std::cout << "id author " << core::ENGINE_AUTHOR << "\n";
-        std::cout << "uciok\n";
-        return 0;
-    }
 
     if (command == "perft" || command == "divide") {
         int depth = 1;
