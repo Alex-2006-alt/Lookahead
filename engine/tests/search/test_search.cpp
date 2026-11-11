@@ -24,6 +24,10 @@ protected:
         global_tt.clear();
         reset_features_to_default();
     }
+
+    void TearDown() override {
+        reset_features_to_default();
+    }
 };
 
 TEST_F(SearchTest, TTStoreAndProbeRoundtrip) {
@@ -93,6 +97,8 @@ TEST_F(SearchTest, NegamaxFindsBackRankMate) {
 
     EXPECT_EQ(res.best_move.to_uci(), "e1e8");
     EXPECT_GE(res.score, MATE_THRESHOLD);
+
+    reset_features_to_default();
 }
 
 TEST_F(SearchTest, SearchWorksWithFeatureToggles) {
@@ -108,4 +114,6 @@ TEST_F(SearchTest, SearchWorksWithFeatureToggles) {
 
     EXPECT_EQ(res.best_move.to_uci(), "e1e8");
     EXPECT_GE(res.score, MATE_THRESHOLD);
+
+    reset_features_to_default();
 }

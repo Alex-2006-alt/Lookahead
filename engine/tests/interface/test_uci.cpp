@@ -8,10 +8,25 @@
 #include <sstream>
 #include "interface/uci.h"
 #include "core/version.h"
+#include "search/transposition_table.h"
+#include "search/features.h"
 
 using namespace lookahead;
 
-TEST(UciTest, UciHandshake) {
+class UciTest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        search::reset_features_to_default();
+        search::global_tt.resize(16);
+        search::global_tt.clear();
+    }
+
+    void TearDown() override {
+        search::reset_features_to_default();
+    }
+};
+
+TEST_F(UciTest, UciHandshake) {
     std::istringstream in("uci\nquit\n");
     std::ostringstream out;
 
@@ -26,7 +41,7 @@ TEST(UciTest, UciHandshake) {
     EXPECT_NE(response.find("uciok"), std::string::npos);
 }
 
-TEST(UciTest, IsReadyResponse) {
+TEST_F(UciTest, IsReadyResponse) {
     std::istringstream in("isready\nquit\n");
     std::ostringstream out;
 
@@ -37,7 +52,7 @@ TEST(UciTest, IsReadyResponse) {
     EXPECT_NE(response.find("readyok"), std::string::npos);
 }
 
-TEST(UciTest, UciNewGameResetsBoard) {
+TEST_F(UciTest, UciNewGameResetsBoard) {
     std::istringstream in("position startpos moves e2e4 e7e5\nucinewgame\nquit\n");
     std::ostringstream out;
 
@@ -47,7 +62,7 @@ TEST(UciTest, UciNewGameResetsBoard) {
     EXPECT_EQ(uci.position().to_fen(), core::Position::START_FEN);
 }
 
-TEST(UciTest, PositionStartposMoves) {
+TEST_F(UciTest, PositionStartposMoves) {
     std::istringstream in("position startpos moves e2e4 e7e5 g1f3\nquit\n");
     std::ostringstream out;
 
@@ -61,7 +76,7 @@ TEST(UciTest, PositionStartposMoves) {
     EXPECT_EQ(pos.side_to_move(), core::Color::Black);
 }
 
-TEST(UciTest, PositionFenAndMoves) {
+TEST_F(UciTest, PositionFenAndMoves) {
     // Scholar's Mate setup position
     const std::string fen = "r1bqkb1r/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1";
     std::istringstream in("position fen " + fen + " moves h5f7\nquit\n");
@@ -75,7 +90,7 @@ TEST(UciTest, PositionFenAndMoves) {
     EXPECT_EQ(pos.side_to_move(), core::Color::Black);
 }
 
-TEST(UciTest, SetOptionHashAndClear) {
+TEST_F(UciTest, SetOptionHashAndClear) {
     std::istringstream in("setoption name Hash value 32\nsetoption name Clear Hash\nquit\n");
     std::ostringstream out;
 
@@ -85,7 +100,7 @@ TEST(UciTest, SetOptionHashAndClear) {
     EXPECT_FALSE(uci.is_running());
 }
 
-TEST(UciTest, GoSearchProducesBestMove) {
+TEST_F(UciTest, GoSearchProducesBestMove) {
     std::istringstream in("position startpos\ngo depth 2\nquit\n");
     std::ostringstream out;
 

@@ -7,6 +7,7 @@
 #include <gtest/gtest.h>
 #include "search/move_ordering.h"
 #include "search/search.h"
+#include "search/transposition_table.h"
 #include "search/features.h"
 #include "core/position.h"
 
@@ -117,6 +118,8 @@ TEST(MoveOrderingTest, PickNextMoveSelectsHighestScoredFirst) {
 }
 
 TEST(MoveOrderingTest, MoveOrderingReducesSearchNodes) {
+    search::reset_features_to_default();
+
     core::Position pos;
     ASSERT_TRUE(pos.set_fen(core::Position::START_FEN));
 
@@ -125,10 +128,12 @@ TEST(MoveOrderingTest, MoveOrderingReducesSearchNodes) {
 
     // Search with move ordering enabled
     search::active_features.use_move_ordering = true;
+    search::global_tt.clear();
     const auto result_ordered = search::search(pos, limits);
 
     // Search with move ordering disabled
     search::active_features.use_move_ordering = false;
+    search::global_tt.clear();
     const auto result_unordered = search::search(pos, limits);
 
     // Restore feature toggles to defaults
