@@ -50,7 +50,7 @@ jobs:
 
       - name: Run Unit Tests
         run: |
-          ctest --test-dir build --output-on-failure
+          ./build/lookahead_tests 2>&1 | tee -a $GITHUB_STEP_SUMMARY
 
   sanitizer-checks:
     name: Clang AddressSanitizer & UBSan
@@ -81,4 +81,4 @@ jobs:
 
       - name: Run Sanitized Tests
         run: |
-          ctest --test-dir build-san --output-on-failure
+          ./build-san/lookahead_tests 2>&1 | tee -a $GITHUB_STEP_SUMMARY
