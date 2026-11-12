@@ -111,3 +111,39 @@ TEST_F(UciTest, GoSearchProducesBestMove) {
     EXPECT_NE(response.find("info depth"), std::string::npos);
     EXPECT_NE(response.find("bestmove"), std::string::npos);
 }
+
+TEST_F(UciTest, StopInterruptsInfiniteSearch) {
+    std::istringstream in("position startpos\ngo infinite\nstop\nquit\n");
+    std::ostringstream out;
+
+    interface::UciHandler uci(in, out);
+    uci.loop();
+
+    const std::string response = out.str();
+    EXPECT_NE(response.find("bestmove"), std::string::npos);
+    EXPECT_FALSE(uci.is_searching());
+    EXPECT_FALSE(uci.is_running());
+}
+
+TEST_F(UciTest, IsReadyHandshakeDuringSearch) {
+    std::istringstream in("position startpos\ngo depth 10\nisready\nstop\nquit\n");
+    std::ostringstream out;
+
+    interface::UciHandler uci(in, out);
+    uci.loop();
+
+    const std::string response = out.str();
+    EXPECT_NE(response.find("readyok"), std::string::npos);
+    EXPECT_NE(response.find("bestmove"), std::string::npos);
+}
+
+TEST_F(UciTest, QuitAbortsActiveSearchGracefully) {
+    std::istringstream in("position startpos\ngo infinite\nquit\n");
+    std::ostringstream out;
+
+    interface::UciHandler uci(in, out);
+    uci.loop();
+
+    EXPECT_FALSE(uci.is_searching());
+    EXPECT_FALSE(uci.is_running());
+}
