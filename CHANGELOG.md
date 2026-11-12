@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- UCI search feature toggle options (`TranspositionTable`, `QuiescenceSearch`, `MoveOrdering`, `NullMovePruning`, `LateMoveReductions`, `ReverseFutility`, `AspirationWindows`) in `interface/uci.cpp`.
+- Automated search heuristic ablation runner in `tools/run_ablation.py` measuring empirical Elo contributions and win/draw/loss statistics against baseline.
+- Unit test suite for heuristic ablation runner in `tools/test_run_ablation.py`.
+- Ablation study methodology, mathematical isolation framework, and CI stability rules documented in `docs/07-testing-and-strength.md`.
+- Empirical ablation results table and benchmark guidelines in `docs/RESULTS.md`.
 - Curated 24-position tournament opening suite across ECO classifications A through E in `data/openings.epd`.
 - Automated head-to-head tournament match runner and statistical rating calculator in `tools/match_runner.py` featuring color alternation, live adjudication, and full PGN transcript generation.
 - Statistical Elo measurement with 95% confidence intervals derived from logistic score distribution and sample variance.

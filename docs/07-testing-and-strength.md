@@ -89,3 +89,28 @@ Reported as: $\Delta \text{Elo} \pm \text{Margin}_{95\%}$.
 4. **Fifty-Move Rule**: Automatic draw adjudication when halfmove clock reaches 100.
 5. **Insufficient Material**: Automatic draw adjudication on K vs K, K+N vs K, K+B vs K, K+B vs K+B (same color).
 6. **Move Limit Cutoff**: Default 150 moves per game to avoid infinite endgames.
+
+---
+
+## Heuristic Ablation Study Framework (`tools/run_ablation.py`)
+
+Lookahead exposes every search heuristic as an independent boolean UCI option (`type check default true`):
+- `TranspositionTable`: TT transposition probe cutoffs and bestmove extraction
+- `MoveOrdering`: Move ranking by TT move, MVV-LVA, killers, and history heuristic
+- `QuiescenceSearch`: Stand-pat tactical capture extensions at leaf nodes
+- `NullMovePruning`: Adaptive null-move forward pruning ($R=2$ or $R=3$)
+- `LateMoveReductions`: Logarithmic reductions on late quiet moves
+- `ReverseFutility`: Static evaluation margin pruning in pre-frontier nodes
+- `AspirationWindows`: Iterative search narrowing around previous depth scores
+
+The automated ablation runner (`tools/run_ablation.py`) executes head-to-head matches between full Baseline Lookahead and single-heuristic disabled variants across the 24 balanced openings in `data/openings.epd`, isolating the empirical contribution and Elo value of each component.
+
+---
+
+## Test Isolation & CI Stability Guidelines
+
+To ensure tests and CI checks never experience regressions or intermittent failures:
+
+1. **Search & Cache Isolation**: Any test invoking search or inspecting PV strings, nodes, or depth MUST invoke `search::reset_features_to_default()` and `search::global_tt.clear()` in its fixture setup (`SetUp()`) or body. Caching bleed between tests can cause root TT cutoffs and alter expected search outputs.
+2. **Root PV Extraction on TT Cutoffs**: When a search probe hits the Transposition Table at root (`ply == 0`), `pv.update(0, tt_move)` must be explicitly called to ensure PV chains are populated even on immediate cutoffs.
+3. **Adaptive Time Bounds in Verifiers**: The tournament `TimeManager` intentionally aborts initiating deeper plies when $\ge 50\%$ of target movetime has expired to protect clock safety. External verification assertions (e.g. `verify_uci.py`) must accept elapsed execution time within $[0.4 \times T_{\text{target}}, 5.0 \times T_{\text{target}}]$ to handle both early half-time depth terminations and runner process scheduling delays.

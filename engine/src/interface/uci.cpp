@@ -10,6 +10,7 @@
 #include "core/version.h"
 #include "movegen/movegen.h"
 #include "search/transposition_table.h"
+#include "search/features.h"
 
 namespace lookahead::interface {
 
@@ -61,6 +62,13 @@ void UciHandler::handle_command(std::string_view line) {
         out_ << "id author " << core::ENGINE_AUTHOR << "\n";
         out_ << "option name Hash type spin default 16 min 1 max 1024\n";
         out_ << "option name Clear Hash type button\n";
+        out_ << "option name TranspositionTable type check default true\n";
+        out_ << "option name QuiescenceSearch type check default true\n";
+        out_ << "option name MoveOrdering type check default true\n";
+        out_ << "option name NullMovePruning type check default true\n";
+        out_ << "option name LateMoveReductions type check default true\n";
+        out_ << "option name ReverseFutility type check default true\n";
+        out_ << "option name AspirationWindows type check default true\n";
         out_ << "uciok\n";
         out_.flush();
     } else if (cmd == "isready") {
@@ -211,6 +219,15 @@ void UciHandler::handle_setoption(std::string_view args) {
         } catch (...) {}
     } else if (name == "Clear Hash") {
         search::global_tt.clear();
+    } else if (!value.empty()) {
+        const bool enabled = (value == "true" || value == "1");
+        if (name == "TranspositionTable") search::active_features.use_transposition_table = enabled;
+        else if (name == "QuiescenceSearch") search::active_features.use_quiescence_search = enabled;
+        else if (name == "MoveOrdering") search::active_features.use_move_ordering = enabled;
+        else if (name == "NullMovePruning") search::active_features.use_null_move_pruning = enabled;
+        else if (name == "LateMoveReductions") search::active_features.use_late_move_reductions = enabled;
+        else if (name == "ReverseFutility") search::active_features.use_reverse_futility = enabled;
+        else if (name == "AspirationWindows") search::active_features.use_aspiration_windows = enabled;
     }
 }
 

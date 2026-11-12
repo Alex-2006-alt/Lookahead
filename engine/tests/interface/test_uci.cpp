@@ -147,3 +147,38 @@ TEST_F(UciTest, QuitAbortsActiveSearchGracefully) {
     EXPECT_FALSE(uci.is_searching());
     EXPECT_FALSE(uci.is_running());
 }
+
+TEST_F(UciTest, AdvertisesAndTogglesSearchFeatureOptions) {
+    std::istringstream in(
+        "uci\n"
+        "setoption name TranspositionTable value false\n"
+        "setoption name QuiescenceSearch value false\n"
+        "setoption name MoveOrdering value false\n"
+        "setoption name NullMovePruning value false\n"
+        "setoption name LateMoveReductions value false\n"
+        "quit\n"
+    );
+    std::ostringstream out;
+
+    interface::UciHandler uci(in, out);
+    uci.loop();
+
+    const std::string response = out.str();
+    EXPECT_NE(response.find("option name TranspositionTable type check"), std::string::npos);
+    EXPECT_NE(response.find("option name QuiescenceSearch type check"), std::string::npos);
+    EXPECT_NE(response.find("option name MoveOrdering type check"), std::string::npos);
+    EXPECT_NE(response.find("option name NullMovePruning type check"), std::string::npos);
+    EXPECT_NE(response.find("option name LateMoveReductions type check"), std::string::npos);
+
+    EXPECT_FALSE(search::active_features.use_transposition_table);
+    EXPECT_FALSE(search::active_features.use_quiescence_search);
+    EXPECT_FALSE(search::active_features.use_move_ordering);
+    EXPECT_FALSE(search::active_features.use_null_move_pruning);
+    EXPECT_FALSE(search::active_features.use_late_move_reductions);
+
+    std::istringstream in2("setoption name TranspositionTable value true\nquit\n");
+    std::ostringstream out2;
+    interface::UciHandler uci2(in2, out2);
+    uci2.loop();
+    EXPECT_TRUE(search::active_features.use_transposition_table);
+}
