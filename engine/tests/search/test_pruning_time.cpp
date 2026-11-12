@@ -10,6 +10,7 @@
 #include "search/pruning.h"
 #include "search/time_manager.h"
 #include "search/search.h"
+#include "search/transposition_table.h"
 #include "search/features.h"
 #include "core/position.h"
 
@@ -65,6 +66,9 @@ TEST(TimeManagerTest, NodeCountLimit) {
 }
 
 TEST(SearchIntegrationTest, SearchCallbackReportsProgress) {
+    search::reset_features_to_default();
+    search::global_tt.clear();
+
     core::Position pos;
     ASSERT_TRUE(pos.set_fen(core::Position::START_FEN));
 
@@ -88,6 +92,9 @@ TEST(SearchIntegrationTest, SearchCallbackReportsProgress) {
 }
 
 TEST(SearchIntegrationTest, SolvesAllMatePuzzlesFromEpd) {
+    search::reset_features_to_default();
+    search::global_tt.clear();
+
     std::ifstream file("data/mate_puzzles.epd");
     if (!file.is_open()) {
         file.open("../data/mate_puzzles.epd");
