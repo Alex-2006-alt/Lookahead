@@ -56,6 +56,10 @@ jobs:
         run: |
           python tools/verify_uci.py
 
+      - name: Run Match Runner Unit Tests
+        run: |
+          python tools/test_match_runner.py
+
   sanitizer-checks:
     name: Clang AddressSanitizer & UBSan
     runs-on: ubuntu-latest
