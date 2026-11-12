@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Asynchronous search worker thread architecture (`std::thread`, `std::atomic<bool>`) in `interface/uci.h` and `interface/uci.cpp` allowing responsive command processing during calculation.
+- Instant search abort controller wiring atomic stop signal into `TimeManager` and negamax search loop for `stop` and `quit` commands.
+- Mutex-guarded output stream synchronization preventing interleaved output between telemetry streams and synchronous responses.
+- Automated end-to-end UCI protocol verifier in `tools/verify_uci.py` testing handshakes, options, async stop latency, tactical mates, and time controls.
+- CI pipeline integration executing `tools/verify_uci.py` on Linux GCC workflows.
+- Expanded GoogleTest suite to 90 tests with asynchronous interruption, concurrent `isready`, and clean shutdown coverage in `engine/tests/interface/test_uci.cpp`.
 - Layer 4 interface module implementing Universal Chess Interface (UCI) protocol interpreter in `interface/uci.h` and `interface/uci.cpp`.
 - Stream dependency injection (`std::istream& in`, `std::ostream& out`) enabling deterministic, in-process UCI unit testing without OS subprocess piping.
 - Full UCI handshake (`uci`, `isready`, `ucinewgame`), board position setup (`startpos`, `fen`, `moves`), dynamic option configuration (`Hash`, `Clear Hash`), and search dispatch (`go` limits).

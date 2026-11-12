@@ -21,7 +21,8 @@ public:
     TimeManager() = default;
 
     // Initializes time allocation given search limits and side to move.
-    void init(const SearchLimits& limits, core::Color us) noexcept;
+    void init(const SearchLimits& limits, core::Color us,
+              const std::atomic<bool>* external_stop = nullptr) noexcept;
 
     // Checks whether search must terminate immediately.
     [[nodiscard]] bool should_stop(uint64_t nodes) noexcept;
@@ -43,6 +44,7 @@ private:
     int64_t hard_time_limit_ms_ = -1;
     uint64_t max_nodes_ = 0;
     std::atomic<bool> stop_requested_{false};
+    const std::atomic<bool>* external_stop_ = nullptr;
     bool time_limited_ = false;
 };
 

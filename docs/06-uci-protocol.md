@@ -10,29 +10,42 @@ Lookahead implements the standard UCI protocol in Layer 4 (`interface/`), coordi
 
 ## Architecture & Design
 
-### Stream Injection for Deterministic Testing
-Traditional UCI engines read directly from `std::cin` and write to `std::cout`, making automated unit testing dependent on external process spawning or OS-level file descriptor redirection.
+### Asynchronous Search Worker Thread
+In real tournament play, GUIs require engines to search asynchronously so that the communication channel remains responsive to control signals:
+- `isready`: Probes engine health and synchronization while calculation is underway.
+- `stop`: Instructs the engine to terminate search early and return its current best move.
+- `quit`: Instructs the engine to abort calculation immediately and exit cleanly.
 
-In Lookahead, `UciHandler` decouples protocol interpretation from physical standard streams via stream dependency injection:
+Lookahead fulfills these requirements with a dedicated worker thread decoupled from the command dispatch loop:
 
 ```cpp
 class UciHandler {
 public:
     explicit UciHandler(std::istream& in = std::cin, std::ostream& out = std::cout);
+    ~UciHandler();
+
     void loop();
     void handle_command(std::string_view line);
+    void stop();
+
     [[nodiscard]] const core::Position& position() const noexcept;
     [[nodiscard]] bool is_running() const noexcept;
+    [[nodiscard]] bool is_searching() const noexcept;
+
+private:
+    std::atomic<bool> searching_{false};
+    std::atomic<bool> stop_signal_{false};
+    std::thread search_thread_;
+    std::mutex out_mutex_;
 };
 ```
 
-This architecture allows GoogleTest suites to pass simulated GUI command sequences via `std::istringstream` and inspect engine responses in `std::ostringstream` synchronously with sub-millisecond execution times.
+When `go` is received, `UciHandler` takes a thread-isolated snapshot of the root `Position` and spawns `search_thread_`. The search engine checks `stop_signal_` periodically within its node countdown and iterative deepening loop. When `stop` or `quit` is signaled, `stop_signal_` flips to `true`, causing `search::search()` to exit gracefully, emit `bestmove`, and join cleanly with zero resource leaks.
 
-### Command Dispatch Loop
-The UCI parser normalizes incoming command lines by stripping leading and trailing whitespace, extracting the primary command token, and dispatching to specialized handlers:
-- `handle_position`: Parses `startpos` or arbitrary 6-field FEN strings and executes the subsequent `moves` list sequentially using `movegen::generate_legal_moves()`.
-- `handle_go`: Parses search constraints (`depth`, `movetime`, `wtime`, `btime`, `winc`, `binc`, `nodes`, `movestogo`, `infinite`), binds a real-time `SearchCallback` to stream UCI `info` telemetry, runs iterative deepening, and outputs `bestmove`.
-- `handle_setoption`: Handles dynamic engine configuration such as memory allocation for the Transposition Table.
+### Stream Injection for Deterministic Testing
+Traditional UCI engines read directly from `std::cin` and write to `std::cout`, making automated unit testing dependent on external process spawning or OS-level file descriptor redirection.
+
+In Lookahead, `UciHandler` decouples protocol interpretation from physical standard streams via stream dependency injection (`std::istream& in`, `std::ostream& out`). Output streams are guarded by `std::mutex out_mutex_` to eliminate race conditions between asynchronous worker telemetry and synchronous command responses.
 
 ---
 
@@ -43,12 +56,13 @@ The UCI parser normalizes incoming command lines by stripping leading and traili
 | Command | Arguments | Description |
 |---|---|---|
 | `uci` | none | Engine handshake. Outputs `id name`, `id author`, available options, and terminates with `uciok`. |
-| `isready` | none | Synchronization command. Flushes pending state and responds with `readyok`. |
-| `ucinewgame` | none | Prepares engine for a new game; resets board to starting position and clears the Transposition Table. |
+| `isready` | none | Synchronization command. Responds with `readyok`, even during active asynchronous searches. |
+| `ucinewgame` | none | Prepares engine for a new game; stops any active search, resets board to startpos, and clears the TT. |
 | `position` | `[startpos \| fen <fen>] [moves <m1> ...]` | Sets internal board state and applies subsequent UCI-formatted move list. |
-| `go` | `[depth] [movetime] [wtime] [btime] [winc] [binc] [nodes] [movestogo] [infinite]` | Initiates iterative deepening search subject to time or node limits. |
+| `go` | `[depth] [movetime] [wtime] [btime] [winc] [binc] [nodes] [movestogo] [infinite]` | Initiates asynchronous iterative deepening search in a background worker thread. |
+| `stop` | none | Signals the background search worker to abort and immediately output `bestmove`. |
 | `setoption` | `name <name> [value <val>]` | Adjusts runtime engine configuration options. |
-| `quit` | none | Sets loop termination flag and exits the UCI session cleanly. |
+| `quit` | none | Aborts any active search worker, terminates the command loop, and exits cleanly. |
 
 ### Configurable Options
 
@@ -65,9 +79,10 @@ Lookahead's native CLI (`engine/src/main.cpp`) seamlessly balances standard UCI 
 
 ---
 
-## Unit Testing & Verification
+## Testing & Verification
 
-The UCI protocol compliance is verified via GoogleTest in `engine/tests/interface/test_uci.cpp`:
+### Unit Tests (`engine/tests/interface/test_uci.cpp`)
+Ten GoogleTests verify the protocol layer:
 1. `UciTest.UciHandshake`: Verifies engine identification, author attribution, option declarations, and `uciok`.
 2. `UciTest.IsReadyResponse`: Validates immediate `readyok` handshake response.
 3. `UciTest.UciNewGameResetsBoard`: Verifies board and TT reset after multi-ply move sequences.
@@ -75,3 +90,16 @@ The UCI protocol compliance is verified via GoogleTest in `engine/tests/interfac
 5. `UciTest.PositionFenAndMoves`: Validates arbitrary FEN setup (e.g. Scholar's Mate) and subsequent moves.
 6. `UciTest.SetOptionHashAndClear`: Verifies dynamic hash resizing and clearing.
 7. `UciTest.GoSearchProducesBestMove`: Validates `go` search limit ingestion, streaming `info` telemetry lines, and terminal `bestmove` emission.
+8. `UciTest.StopInterruptsInfiniteSearch`: Validates that `stop` halts infinite search and emits `bestmove`.
+9. `UciTest.IsReadyHandshakeDuringSearch`: Confirms `readyok` response while background search is actively computing.
+10. `UciTest.QuitAbortsActiveSearchGracefully`: Ensures `quit` aborts worker thread without leaks or aborts.
+
+### Automated End-to-End Verifier (`tools/verify_uci.py`)
+An automated Cutechess-style harness connects to the compiled engine binary via standard I/O pipes and executes 7 integration scenarios:
+- Handshake negotiation
+- Synchronization probe
+- Dynamic hash reconfiguration
+- Fixed-depth search execution and telemetry format verification
+- Asynchronous infinite search abort with latency measurement (< 500ms)
+- Tactical position checkmate resolution (`h5f7#`)
+- Time control adherence (`movetime 200`)

@@ -1,6 +1,6 @@
 /*
- * What: Implementation of Universal Chess Interface (UCI) parser and dispatch loop.
- * Why:  Handles GUI handshakes, position setup, clock management, and search invocation.
+ * What: Implementation of Universal Chess Interface (UCI) parser and async worker.
+ * Why:  Handles GUI handshakes, position setup, clock management, and search worker thread.
  * Layer: Layer 4 (interface) - depends on uci.h, core, movegen, and search.
  */
 
@@ -18,11 +18,28 @@ UciHandler::UciHandler(std::istream& in, std::ostream& out)
     pos_.set_startpos();
 }
 
+UciHandler::~UciHandler() {
+    stop_and_join();
+}
+
+void UciHandler::stop() {
+    stop_and_join();
+}
+
+void UciHandler::stop_and_join() noexcept {
+    stop_signal_.store(true, std::memory_order_release);
+    if (search_thread_.joinable()) {
+        search_thread_.join();
+    }
+    searching_.store(false, std::memory_order_release);
+}
+
 void UciHandler::loop() {
     std::string line;
     while (running_ && std::getline(in_, line)) {
         handle_command(line);
     }
+    stop_and_join();
 }
 
 void UciHandler::handle_command(std::string_view line) {
@@ -39,6 +56,7 @@ void UciHandler::handle_command(std::string_view line) {
     const std::string_view rest = (first_space != std::string_view::npos) ? line.substr(first_space + 1) : "";
 
     if (cmd == "uci") {
+        std::lock_guard<std::mutex> lock(out_mutex_);
         out_ << "id name " << core::ENGINE_NAME << " " << core::ENGINE_VERSION << "\n";
         out_ << "id author " << core::ENGINE_AUTHOR << "\n";
         out_ << "option name Hash type spin default 16 min 1 max 1024\n";
@@ -46,18 +64,26 @@ void UciHandler::handle_command(std::string_view line) {
         out_ << "uciok\n";
         out_.flush();
     } else if (cmd == "isready") {
+        std::lock_guard<std::mutex> lock(out_mutex_);
         out_ << "readyok\n";
         out_.flush();
+    } else if (cmd == "stop") {
+        stop_and_join();
     } else if (cmd == "ucinewgame") {
+        stop_and_join();
         search::global_tt.clear();
         pos_.set_startpos();
     } else if (cmd == "position") {
+        stop_and_join();
         handle_position(rest);
     } else if (cmd == "go") {
+        stop_and_join();
         handle_go(rest);
     } else if (cmd == "setoption") {
+        stop_and_join();
         handle_setoption(rest);
     } else if (cmd == "quit") {
+        stop_and_join();
         running_ = false;
     }
 }
@@ -131,21 +157,31 @@ void UciHandler::handle_go(std::string_view args) {
         limits.depth = 6;
     }
 
-    const auto res = search::search(pos_, limits, [&](const search::SearchInfo& info) {
-        out_ << "info depth " << info.depth
-             << " score cp " << info.score
-             << " nodes " << info.nodes
-             << " nps " << static_cast<uint64_t>(info.nps)
-             << " time " << static_cast<int64_t>(info.elapsed_seconds * 1000.0);
-        if (!info.pv_string.empty()) {
-            out_ << " pv " << info.pv_string;
-        }
-        out_ << "\n";
-        out_.flush();
-    });
+    stop_signal_.store(false, std::memory_order_release);
+    searching_.store(true, std::memory_order_release);
 
-    out_ << "bestmove " << res.best_move.to_uci() << "\n";
-    out_.flush();
+    search_thread_ = std::thread([this, search_pos = pos_, limits]() mutable {
+        const auto res = search::search(search_pos, limits, [this](const search::SearchInfo& info) {
+            std::lock_guard<std::mutex> lock(out_mutex_);
+            out_ << "info depth " << info.depth
+                 << " score cp " << info.score
+                 << " nodes " << info.nodes
+                 << " nps " << static_cast<uint64_t>(info.nps)
+                 << " time " << static_cast<int64_t>(info.elapsed_seconds * 1000.0);
+            if (!info.pv_string.empty()) {
+                out_ << " pv " << info.pv_string;
+            }
+            out_ << "\n";
+            out_.flush();
+        }, &stop_signal_);
+
+        {
+            std::lock_guard<std::mutex> lock(out_mutex_);
+            out_ << "bestmove " << res.best_move.to_uci() << "\n";
+            out_.flush();
+        }
+        searching_.store(false, std::memory_order_release);
+    });
 }
 
 void UciHandler::handle_setoption(std::string_view args) {

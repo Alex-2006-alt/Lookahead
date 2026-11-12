@@ -12,6 +12,7 @@
 #include <string>
 #include <array>
 #include <functional>
+#include <atomic>
 #include "core/types.h"
 #include "core/move.h"
 #include "core/position.h"
@@ -90,7 +91,8 @@ struct SearchResult {
 
 // Executes alpha-beta negamax search from root position according to limits.
 [[nodiscard]] SearchResult search(core::Position& pos, const SearchLimits& limits,
-                                  SearchCallback callback = nullptr);
+                                  SearchCallback callback = nullptr,
+                                  const std::atomic<bool>* stop_signal = nullptr);
 
 }  // namespace lookahead::search
 

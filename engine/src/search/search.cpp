@@ -183,10 +183,19 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
 
 }  // namespace
 
-SearchResult search(core::Position& pos, const SearchLimits& limits, SearchCallback callback) {
+SearchResult search(core::Position& pos, const SearchLimits& limits,
+                    SearchCallback callback, const std::atomic<bool>* stop_signal) {
     SearchResult result;
+
+    movegen::MoveList root_moves;
+    movegen::generate_legal_moves(pos, root_moves);
+    if (root_moves.empty()) {
+        return result;
+    }
+    result.best_move = root_moves[0];
+
     TimeManager time_mgr;
-    time_mgr.init(limits, pos.side_to_move());
+    time_mgr.init(limits, pos.side_to_move(), stop_signal);
 
     const int max_d = (limits.depth > 0) ? limits.depth : 64;
     global_tt.advance_generation();
@@ -245,7 +254,7 @@ SearchResult search(core::Position& pos, const SearchLimits& limits, SearchCallb
         result.score = score;
         result.depth_reached = current_depth;
         result.pv = pv.get_pv(0);
-        if (!result.pv.empty()) {
+        if (!result.pv.empty() && !result.pv[0].is_null()) {
             result.best_move = result.pv[0];
             std::string pv_str;
             for (size_t k = 0; k < result.pv.size(); ++k) {
