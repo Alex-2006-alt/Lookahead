@@ -10,9 +10,11 @@
 
 namespace lookahead::search {
 
-void TimeManager::init(const SearchLimits& limits, core::Color us) noexcept {
+void TimeManager::init(const SearchLimits& limits, core::Color us,
+                        const std::atomic<bool>* external_stop) noexcept {
     start_time_ = std::chrono::high_resolution_clock::now();
     stop_requested_.store(false, std::memory_order_relaxed);
+    external_stop_ = external_stop;
     max_nodes_ = limits.max_nodes;
     time_limited_ = false;
     target_time_ms_ = -1;
@@ -46,6 +48,11 @@ bool TimeManager::should_stop(uint64_t nodes) noexcept {
         return true;
     }
 
+    if (external_stop_ && external_stop_->load(std::memory_order_relaxed)) {
+        stop_requested_.store(true, std::memory_order_relaxed);
+        return true;
+    }
+
     if (max_nodes_ > 0 && nodes >= max_nodes_) {
         stop_requested_.store(true, std::memory_order_relaxed);
         return true;
@@ -64,6 +71,9 @@ bool TimeManager::should_stop(uint64_t nodes) noexcept {
 
 bool TimeManager::can_start_next_depth() const noexcept {
     if (stop_requested_.load(std::memory_order_relaxed)) {
+        return false;
+    }
+    if (external_stop_ && external_stop_->load(std::memory_order_relaxed)) {
         return false;
     }
     if (!time_limited_) {
