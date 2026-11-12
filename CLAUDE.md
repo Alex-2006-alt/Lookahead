@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 5 (Search) - PR 3: Pruning, Reductions, Time Manager & Mate Puzzles [Completing Phase 5]
-- **Active Branch**: `phase-5-search-pruning-time`
-- **Next Step**: User reviews & merges PR 11, then start Phase 6 (UCI Protocol Implementation)
+- **Current Phase**: Phase 6 (Universal Chess Interface - UCI) - PR 1: Core Protocol, Parser & Synchronous Dispatch
+- **Active Branch**: `phase-6-interface-uci-core`
+- **Next Step**: User reviews & merges PR 12, then proceed to Sub-PR 6.2 (Async Search Worker & Non-Blocking Stdin)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
