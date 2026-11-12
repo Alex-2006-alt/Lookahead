@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Curated 24-position tournament opening suite across ECO classifications A through E in `data/openings.epd`.
+- Automated head-to-head tournament match runner and statistical rating calculator in `tools/match_runner.py` featuring color alternation, live adjudication, and full PGN transcript generation.
+- Statistical Elo measurement with 95% confidence intervals derived from logistic score distribution and sample variance.
+- Unit test suite for tournament match runner and opening book validation in `tools/test_match_runner.py`.
+- Comprehensive documentation of tournament methodology, statistical formulations, and adjudication in `docs/07-testing-and-strength.md`.
 - Asynchronous search worker thread architecture (`std::thread`, `std::atomic<bool>`) in `interface/uci.h` and `interface/uci.cpp` allowing responsive command processing during calculation.
 - Instant search abort controller wiring atomic stop signal into `TimeManager` and negamax search loop for `stop` and `quit` commands.
 - Mutex-guarded output stream synchronization preventing interleaved output between telemetry streams and synchronous responses.
