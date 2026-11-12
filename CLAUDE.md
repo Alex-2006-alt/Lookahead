@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 6 (Universal Chess Interface - UCI) - PR 2: Asynchronous Search Worker & GUI Verification [Completing Phase 6]
-- **Active Branch**: `phase-6-interface-uci-async`
-- **Next Step**: User reviews & merges PR 13, then proceed to Phase 7 (Strength Verification & Cutechess Matches)
+- **Current Phase**: Phase 7 (Strength Verification & Testing) - PR 1: Tournament Opening Book & Automated Match Runner
+- **Active Branch**: `phase-7-match-runner-openings`
+- **Next Step**: User reviews & merges PR 14, then proceed to Sub-PR 7.2 (Ablation Study Runner & Heuristic Measurement)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`

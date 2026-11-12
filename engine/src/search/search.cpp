@@ -50,12 +50,15 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
             if (entry->depth >= depth) {
                 const int tt_score = score_from_tt(entry->score, ply);
                 if (entry->flag == TTFlag::Exact) {
+                    if (ply == 0 && !tt_move.is_null()) pv.update(ply, tt_move);
                     return tt_score;
                 }
                 if (entry->flag == TTFlag::LowerBound && tt_score >= beta) {
+                    if (ply == 0 && !tt_move.is_null()) pv.update(ply, tt_move);
                     return tt_score;
                 }
                 if (entry->flag == TTFlag::UpperBound && tt_score <= alpha) {
+                    if (ply == 0 && !tt_move.is_null()) pv.update(ply, tt_move);
                     return tt_score;
                 }
             }
@@ -169,12 +172,9 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
 
     // Transposition Table recording
     if (active_features.use_transposition_table && !time_mgr.is_stopped()) {
-        TTFlag flag = TTFlag::Exact;
-        if (best_score <= original_alpha) {
-            flag = TTFlag::UpperBound;
-        } else if (best_score >= beta) {
-            flag = TTFlag::LowerBound;
-        }
+        const TTFlag flag = (best_score <= original_alpha) ? TTFlag::UpperBound
+                          : (best_score >= beta)           ? TTFlag::LowerBound
+                                                           : TTFlag::Exact;
         global_tt.store(key, best_move, best_score, depth, flag, ply);
     }
 
@@ -186,12 +186,9 @@ int negamax(core::Position& pos, int depth, int ply, int alpha, int beta,
 SearchResult search(core::Position& pos, const SearchLimits& limits,
                     SearchCallback callback, const std::atomic<bool>* stop_signal) {
     SearchResult result;
-
     movegen::MoveList root_moves;
     movegen::generate_legal_moves(pos, root_moves);
-    if (root_moves.empty()) {
-        return result;
-    }
+    if (root_moves.empty()) return result;
     result.best_move = root_moves[0];
 
     TimeManager time_mgr;
@@ -202,8 +199,7 @@ SearchResult search(core::Position& pos, const SearchLimits& limits,
 
     KillerTable killers;
     HistoryTable history;
-    killers.clear();
-    history.clear();
+    killers.clear(); history.clear();
 
     PVTable pv;
     int last_score = 0;
@@ -214,8 +210,7 @@ SearchResult search(core::Position& pos, const SearchLimits& limits,
             break;
         }
 
-        int alpha = -SCORE_INFINITY;
-        int beta = SCORE_INFINITY;
+        int alpha = -SCORE_INFINITY, beta = SCORE_INFINITY;
         const int delta = 50;
 
         if (active_features.use_aspiration_windows && current_depth >= 4 &&
@@ -268,6 +263,13 @@ SearchResult search(core::Position& pos, const SearchLimits& limits,
         result.nps = (result.elapsed_seconds > 0.0)
                          ? (static_cast<double>(result.nodes) / result.elapsed_seconds)
                          : 0.0;
+
+        if (result.pv_string.empty() && !result.best_move.is_null()) {
+            result.pv_string = result.best_move.to_uci();
+            if (result.pv.empty()) {
+                result.pv.push_back(result.best_move);
+            }
+        }
 
         if (callback) {
             SearchInfo info;
