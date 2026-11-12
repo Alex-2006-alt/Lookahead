@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 7 (Strength Verification & Testing) - PR 1: Tournament Opening Book & Automated Match Runner
-- **Active Branch**: `phase-7-match-runner-openings`
-- **Next Step**: User reviews & merges PR 14, then proceed to Sub-PR 7.2 (Ablation Study Runner & Heuristic Measurement)
+- **Current Phase**: Phase 7 (Strength Verification & Testing) - Sub-PR 7.2: Ablation Study Runner & Heuristic Measurement
+- **Active Branch**: `phase-7-ablation-study`
+- **Next Step**: Open PR #15, wait for user review & merge, then proceed to Sub-PR 7.3 (Engine Benchmark Suite & Calibration)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
@@ -20,6 +20,10 @@
 4. **Feature Toggles**: All search and evaluation feature flags reside in `search/features.h` and an evaluation config, nowhere else.
 5. **No Dynamic Allocations in Search**: No heap allocations (`new`, `malloc`, `std::vector::push_back` reallocation) in the search hot path.
 6. **Data Separation**: Test positions live in `data/`, never hardcoded into test source code.
+7. **Test Isolation & CI Stability Rules**:
+   - Every test that inspects search results, nodes, depths, or PV strings MUST call `search::reset_features_to_default();` and `search::global_tt.clear();` in its fixture `SetUp()` or test body.
+   - Root PV Extraction: Always call `pv.update(0, tt_move)` on root TT hits and fallback to `best_move.to_uci()` so PV strings are never empty.
+   - Time Assertion Margins: The engine intentionally avoids starting new depths when $\ge 50\%$ of target movetime has elapsed. Verifier scripts must accept $[0.4 \times T, 5.0 \times T]$ bounds.
 
 ## Git Workflow Rules
 1. **Never Commit to Main**: Only the initial bootstrap commit may go to `main`. All subsequent work happens in dedicated feature branches (`phase-N-name`).
