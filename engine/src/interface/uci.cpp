@@ -30,9 +30,11 @@ void UciHandler::stop() {
 
 void UciHandler::stop_and_join() noexcept {
     stop_signal_.store(true, std::memory_order_release);
+#if !defined(__EMSCRIPTEN__)
     if (search_thread_.joinable()) {
         search_thread_.join();
     }
+#endif
     searching_.store(false, std::memory_order_release);
 }
 
@@ -177,6 +179,28 @@ void UciHandler::handle_go(std::string_view args) {
     stop_signal_.store(false, std::memory_order_release);
     searching_.store(true, std::memory_order_release);
 
+#if defined(__EMSCRIPTEN__)
+    const auto res = search::search(pos_, limits, [this](const search::SearchInfo& info) {
+        std::lock_guard<std::mutex> lock(out_mutex_);
+        out_ << "info depth " << info.depth
+             << " score cp " << info.score
+             << " nodes " << info.nodes
+             << " nps " << static_cast<uint64_t>(info.nps)
+             << " time " << static_cast<int64_t>(info.elapsed_seconds * 1000.0);
+        if (!info.pv_string.empty()) {
+            out_ << " pv " << info.pv_string;
+        }
+        out_ << "\n";
+        out_.flush();
+    }, &stop_signal_);
+
+    {
+        std::lock_guard<std::mutex> lock(out_mutex_);
+        out_ << "bestmove " << res.best_move.to_uci() << "\n";
+        out_.flush();
+    }
+    searching_.store(false, std::memory_order_release);
+#else
     search_thread_ = std::thread([this, search_pos = pos_, limits]() mutable {
         const auto res = search::search(search_pos, limits, [this](const search::SearchInfo& info) {
             std::lock_guard<std::mutex> lock(out_mutex_);
@@ -199,6 +223,7 @@ void UciHandler::handle_go(std::string_view args) {
         }
         searching_.store(false, std::memory_order_release);
     });
+#endif
 }
 
 void UciHandler::handle_setoption(std::string_view args) {
