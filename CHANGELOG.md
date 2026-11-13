@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- WebAssembly C-API bridge in `interface/wasm_api.h` and `interface/wasm_api.cpp` with exported functions (`lookahead_init`, `lookahead_send_command`, `lookahead_set_output_callback`, `lookahead_read_output`, `lookahead_shutdown`).
+- Emscripten WebAssembly build target in `engine/CMakeLists.txt` producing modularized `lookahead.js` and `lookahead.wasm`.
+- GoogleTest suite in `engine/tests/interface/test_wasm_api.cpp` testing C-API handshake, polling queue, tactical search, and clean shutdown (98 tests total).
+- Node.js WebAssembly UCI runtime verifier in `tools/verify_wasm.js`.
+- GitHub Actions CI Emscripten compilation and Node.js verification job in `.github/workflows/ci.yml`.
+- Architectural design document for WebAssembly runtime and Web Worker concurrency model in `docs/08-wasm-and-web-architecture.md`.
 - Standardized 12-position search benchmark suite and throughput profiler in `search/benchmark.h` and `search/benchmark.cpp`.
 - CLI and UCI integration for benchmark suite (`lookahead bench [depth] [hash_mb]` and `bench [depth]`).
 - GoogleTest benchmark suite in `engine/tests/search/test_benchmark.cpp` expanding test suite to 94 tests.

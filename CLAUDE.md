@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 7 (Strength Verification & Testing) - Sub-PR 7.3: Engine Benchmark Suite & Self-Play Calibration
-- **Active Branch**: `phase-7-benchmark-suite`
-- **Next Step**: User reviews & merges PR 16, concluding Phase 7, then proceed to Phase 8 (Emscripten WebAssembly & React Web Application)
+- **Current Phase**: Phase 8 (Emscripten WebAssembly & React Web Application) - Sub-PR 8.1: Emscripten WASM Build Configuration & C-API Bridge
+- **Active Branch**: `phase-8-wasm-build-api`
+- **Next Step**: Open PR #17, wait for user review & merge, then proceed to Sub-PR 8.2 (Web Worker WASM Controller & Hook)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
