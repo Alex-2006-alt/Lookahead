@@ -39,13 +39,7 @@ if(ENGINE_SOURCES)
     add_library(lookahead_lib STATIC ${ENGINE_SOURCES})
     target_include_directories(lookahead_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
-    # Native UCI executable
-    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
-        add_executable(lookahead src/main.cpp)
-        target_link_libraries(lookahead PRIVATE lookahead_lib)
-    endif()
-
-    # WebAssembly target (Emscripten)
+    # Build configuration branches: WebAssembly (Emscripten) vs Native Executable
     option(LOOKAHEAD_BUILD_WASM "Build Lookahead WebAssembly Artifacts" OFF)
     if(EMSCRIPTEN OR LOOKAHEAD_BUILD_WASM)
         add_executable(lookahead_wasm src/interface/wasm_api.cpp)
@@ -66,6 +60,10 @@ if(ENGINE_SOURCES)
             "-sINITIAL_MEMORY=67108864"
             "-sENVIRONMENT=web,worker,node"
         )
+    elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+        # Native UCI executable
+        add_executable(lookahead src/main.cpp)
+        target_link_libraries(lookahead PRIVATE lookahead_lib)
     endif()
 else()
     message(STATUS "Phase 1: Engine sources not yet created. Skeleton configured.")
