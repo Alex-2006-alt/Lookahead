@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 7 (Strength Verification & Testing) - Sub-PR 7.2: Ablation Study Runner & Heuristic Measurement
-- **Active Branch**: `phase-7-ablation-study`
-- **Next Step**: Open PR #15, wait for user review & merge, then proceed to Sub-PR 7.3 (Engine Benchmark Suite & Calibration)
+- **Current Phase**: Phase 7 (Strength Verification & Testing) - Sub-PR 7.3: Engine Benchmark Suite & Self-Play Calibration
+- **Active Branch**: `phase-7-benchmark-suite`
+- **Next Step**: User reviews & merges PR 16, concluding Phase 7, then proceed to Phase 8 (Emscripten WebAssembly & React Web Application)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Standardized 12-position search benchmark suite and throughput profiler in `search/benchmark.h` and `search/benchmark.cpp`.
+- CLI and UCI integration for benchmark suite (`lookahead bench [depth] [hash_mb]` and `bench [depth]`).
+- GoogleTest benchmark suite in `engine/tests/search/test_benchmark.cpp` expanding test suite to 94 tests.
+- Python benchmark calibration and NPS profiler in `tools/run_bench.py` and unit tests in `tools/test_run_bench.py`.
+- Continuous integration benchmark throughput validation step in `.github/workflows/ci.yml`.
+- Standardized search throughput benchmark results table in `docs/RESULTS.md` and benchmark documentation in `docs/07-testing-and-strength.md`.
 - UCI search feature toggle options (`TranspositionTable`, `QuiescenceSearch`, `MoveOrdering`, `NullMovePruning`, `LateMoveReductions`, `ReverseFutility`, `AspirationWindows`) in `interface/uci.cpp`.
 - Automated search heuristic ablation runner in `tools/run_ablation.py` measuring empirical Elo contributions and win/draw/loss statistics against baseline.
 - Unit test suite for heuristic ablation runner in `tools/test_run_ablation.py`.

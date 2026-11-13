@@ -15,6 +15,7 @@
 #include "eval/evaluate.h"
 #include "search/search.h"
 #include "search/transposition_table.h"
+#include "search/benchmark.h"
 #include "interface/uci.h"
 
 using namespace lookahead;
@@ -176,6 +177,19 @@ int main(int argc, char* argv[]) {
                       << " nodes " << res.nodes << " nps " << static_cast<uint64_t>(res.nps) << "\n";
         }
         std::cout << "bestmove " << res.best_move.to_uci() << "\n";
+        return 0;
+    }
+
+    if (command == "bench") {
+        int depth = 5;
+        if (argc >= 3) {
+            try { depth = std::stoi(argv[2]); } catch (...) {}
+        }
+        int hash_mb = 16;
+        if (argc >= 4) {
+            try { hash_mb = std::stoi(argv[3]); } catch (...) {}
+        }
+        search::run_benchmark(depth, std::cout, hash_mb);
         return 0;
     }
 
