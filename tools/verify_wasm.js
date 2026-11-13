@@ -22,20 +22,39 @@ async function verifyWasmModule(modulePath) {
   const Module = await factory();
 
   console.log('[WASM Verifier] Module loaded. Initializing engine...');
-  Module._lookahead_init(16);
+  const lookaheadInit = Module.cwrap ? Module.cwrap('lookahead_init', null, ['number']) : Module._lookahead_init;
+  const lookaheadSendCommand = Module.cwrap ? Module.cwrap('lookahead_send_command', null, ['string']) : (cmd) => {
+    const ptr = Module.allocateUTF8 ? Module.allocateUTF8(cmd + '\n') : 0;
+    if (ptr) {
+      Module._lookahead_send_command(ptr);
+      if (Module._free) Module._free(ptr);
+    }
+  };
+  const lookaheadShutdown = Module.cwrap ? Module.cwrap('lookahead_shutdown', null, []) : Module._lookahead_shutdown;
+
+  lookaheadInit(16);
 
   const receivedLines = [];
-  const callbackPtr = Module.addFunction((linePtr) => {
-    const line = Module.UTF8ToString(linePtr);
-    receivedLines.push(line);
-  }, 'vi');
-
-  Module._lookahead_set_output_callback(callbackPtr);
+  let callbackPtr = 0;
+  if (Module.addFunction) {
+    callbackPtr = Module.addFunction((linePtr) => {
+      let line = '';
+      if (Module.UTF8ToString) {
+        line = Module.UTF8ToString(linePtr);
+      } else {
+        let i = linePtr;
+        while (Module.HEAPU8 && Module.HEAPU8[i] !== 0) {
+          line += String.fromCharCode(Module.HEAPU8[i]);
+          i++;
+        }
+      }
+      receivedLines.push(line);
+    }, 'vi');
+    Module._lookahead_set_output_callback(callbackPtr);
+  }
 
   function sendCommand(cmd) {
-    const ptr = Module.allocateUTF8(cmd + '\n');
-    Module._lookahead_send_command(ptr);
-    Module._free(ptr);
+    lookaheadSendCommand(cmd + '\n');
   }
 
   console.log('[WASM Verifier] Testing UCI handshake...');
@@ -89,7 +108,7 @@ async function main() {
   try {
     await verifyWasmModule(target);
   } catch (err) {
-    console.error(`[WASM Verifier] FAILED: ${err.message}`);
+    console.error(`[WASM Verifier] FAILED:`, err);
     process.exit(1);
   }
 }

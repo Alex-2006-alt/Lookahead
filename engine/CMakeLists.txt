@@ -55,7 +55,7 @@ if(ENGINE_SOURCES)
             "-sEXPORT_NAME=LookaheadModule"
             "-sALLOW_TABLE_GROWTH=1"
             "-sEXPORTED_FUNCTIONS=['_lookahead_init','_lookahead_send_command','_lookahead_set_output_callback','_lookahead_read_output','_lookahead_shutdown','_malloc','_free']"
-            "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap','addFunction','removeFunction']"
+            "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap','addFunction','removeFunction','UTF8ToString','stringToUTF8','allocateUTF8','lengthBytesUTF8']"
             "-sALLOW_MEMORY_GROWTH=1"
             "-sINITIAL_MEMORY=67108864"
             "-sENVIRONMENT=web,worker,node"
