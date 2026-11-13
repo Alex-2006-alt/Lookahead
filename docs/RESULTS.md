@@ -62,7 +62,19 @@ python tools/run_ablation.py --binary build/lookahead.exe --games 10 --tc "depth
 
 ---
 
-## 3. Equivalence Verification (Native vs WebAssembly)
+## 3. Standard Search Benchmark Throughput (`bench`)
+
+Measured across the 12 curated benchmark positions with a 16 MB Transposition Table using `tools/run_bench.py`:
+
+| Target Depth | Positions | Total Nodes | Elapsed Time | Aggregate NPS |
+| :---: | :---: | :---: | :---: | :---: |
+| Depth 3 | 12 | 29,982 | 189 ms | ~160,000 nodes/sec |
+| Depth 4 | 12 | 50,588 | 225 ms | ~225,000 nodes/sec |
+| Depth 5 | 12 | 109,653 | 541 ms | ~203,000 nodes/sec |
+
+---
+
+## 4. Equivalence Verification (Native vs WebAssembly)
 
 *(Will be measured in Phase 8 over 200 fixed positions at depth 6)*
 * Positions Tested: 200

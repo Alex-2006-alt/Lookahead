@@ -114,3 +114,28 @@ To ensure tests and CI checks never experience regressions or intermittent failu
 1. **Search & Cache Isolation**: Any test invoking search or inspecting PV strings, nodes, or depth MUST invoke `search::reset_features_to_default()` and `search::global_tt.clear()` in its fixture setup (`SetUp()`) or body. Caching bleed between tests can cause root TT cutoffs and alter expected search outputs.
 2. **Root PV Extraction on TT Cutoffs**: When a search probe hits the Transposition Table at root (`ply == 0`), `pv.update(0, tt_move)` must be explicitly called to ensure PV chains are populated even on immediate cutoffs.
 3. **Adaptive Time Bounds in Verifiers**: The tournament `TimeManager` intentionally aborts initiating deeper plies when $\ge 50\%$ of target movetime has expired to protect clock safety. External verification assertions (e.g. `verify_uci.py`) must accept elapsed execution time within $[0.4 \times T_{\text{target}}, 5.0 \times T_{\text{target}}]$ to handle both early half-time depth terminations and runner process scheduling delays.
+
+---
+
+## Standardized Search Benchmark Suite (`bench`)
+
+To measure raw search throughput (nodes per second) and ensure performance stability across code changes, Lookahead includes a standardized 12-position benchmark suite in `engine/src/search/benchmark.cpp`:
+
+1. **Startpos**: Standard opening board
+2. **Kiwipete**: Highly tactical middlegame with heavy captures and checks
+3. **Position 3**: Pawns and pins complex
+4. **Position 4**: Pawn promotions and castling rights
+5. **Position 5**: Fine tactical endgame
+6. **Position 6**: Symmetrical middlegame complex
+7. **King & Pawn Endgame**: Deep zugzwang testing
+8. **Rook Endgame**: Fast horizon resolution
+9. **Queen & Pawn Endgame**: High mobility testing
+10. **Knight Endgame**: Precise minor piece stepping
+11. **Bishop Endgame**: Color complex testing
+12. **King Safety & Castling**: Sharp opposite-side castling attack
+
+### Invocation Commands
+- **CLI**: `lookahead bench [depth] [hash_mb]` (e.g. `lookahead bench 5 16`)
+- **UCI Protocol**: `bench [depth]` (invoked directly over stdin/stdout)
+- **Profiler Script**: `python tools/run_bench.py --binary build/lookahead.exe --depth 5`
+- **Output Metrics**: per-position nodes, elapsed ms, NPS, and bestmove, followed by total aggregated nodes, total duration, and overall search NPS.
