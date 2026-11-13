@@ -11,6 +11,7 @@
 #include "movegen/movegen.h"
 #include "search/transposition_table.h"
 #include "search/features.h"
+#include "search/benchmark.h"
 
 namespace lookahead::interface {
 
@@ -90,6 +91,14 @@ void UciHandler::handle_command(std::string_view line) {
     } else if (cmd == "setoption") {
         stop_and_join();
         handle_setoption(rest);
+    } else if (cmd == "bench") {
+        stop_and_join();
+        int depth = 5;
+        if (!rest.empty()) {
+            try { depth = std::stoi(std::string(rest)); } catch (...) {}
+        }
+        std::lock_guard<std::mutex> lock(out_mutex_);
+        search::run_benchmark(depth, out_, 16);
     } else if (cmd == "quit") {
         stop_and_join();
         running_ = false;
