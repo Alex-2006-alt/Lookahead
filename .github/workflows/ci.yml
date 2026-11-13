@@ -135,3 +135,21 @@ jobs:
       - name: Verify WebAssembly Module in Node.js
         run: |
           node tools/verify_wasm.js build-wasm/lookahead.js
+
+      - name: Copy WebAssembly Artifacts to Web Public
+        run: |
+          mkdir -p web/public
+          cp build-wasm/lookahead.js web/public/
+          cp build-wasm/lookahead.wasm web/public/
+
+      - name: Install Web Dependencies
+        run: |
+          npm --prefix web ci
+
+      - name: Run Web Unit Tests
+        run: |
+          npm --prefix web test
+
+      - name: Build Web Application
+        run: |
+          npm --prefix web run build

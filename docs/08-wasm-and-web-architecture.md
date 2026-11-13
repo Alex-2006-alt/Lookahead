@@ -80,3 +80,27 @@ The frontend is housed in a dedicated, isolated `web/` directory:
 - **Framework**: React with TypeScript
 - **Styling**: Tailwind CSS with custom chess themes
 - **State Management**: Custom `useEngine` React hook abstracting worker lifecycles, UCI commands, move history, and search metrics.
+
+---
+
+## 5. Web Worker Message Protocol & React State Flow
+
+```
+ UI Thread (React / useEngine)              Web Worker (engineWorker.ts)
+ ─────────────────────────────              ────────────────────────────
+        │                                                │
+        │─── postMessage({ type: 'init' }) ─────────────>│ Instantiates WASM Module
+        │<── postMessage({ type: 'status': 'ready' }) ───│ Initial UCI Handshake
+        │                                                │
+        │─── postMessage({ type: 'position', fen }) ────>│ lookahead_send_command(position)
+        │─── postMessage({ type: 'go', depth: 6 }) ─────>│ lookahead_send_command(go depth 6)
+        │                                                │
+        │<── postMessage({ type: 'info', info }) ────────│ Streaming Telemetry (depth, NPS, pv)
+        │<── postMessage({ type: 'bestmove', bm }) ──────│ Emits Best Move & Returns to Ready
+        │                                                │
+```
+
+- **Types (`web/src/engine/types.ts`)**: Strongly typed message envelopes (`WorkerInMessage`, `WorkerOutMessage`, `SearchInfo`, `EngineStatus`).
+- **Telemetry Parser (`web/src/engine/uciParser.ts`)**: Pure parsing utility transforming UCI `info` tokens (depth, cp/mate scores, nodes, nps, pv) into immutable JavaScript records with zero dependencies.
+- **Worker Controller (`web/src/engine/engineWorker.ts`)**: Handles dynamic WASM factory loading, manages C callback memory boundaries, and guarantees graceful degradation in development.
+- **React Hook (`web/src/engine/useEngine.ts`)**: Reusable React hook exposing state (`status`, `isSearching`, `searchInfo`, `lastBestMove`) and action dispatchers (`startSearch`, `stopSearch`, `newGame`, `sendCommand`).

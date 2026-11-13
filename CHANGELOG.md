@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Vite + React + TypeScript + Tailwind CSS web application workspace in dedicated `web/` folder.
+- Type definitions and message schemas for asynchronous engine Web Worker communication in `web/src/engine/types.ts`.
+- UCI protocol telemetry parser (`parseUciInfoLine`, `parseBestMoveLine`) in `web/src/engine/uciParser.ts`.
+- Dedicated Web Worker controller (`web/src/engine/engineWorker.ts`) managing WebAssembly instance lifecycles and background command execution.
+- Custom React hook (`web/src/engine/useEngine.ts`) abstracting worker message dispatch, search telemetry streaming, and state tracking.
+- Vitest unit test suite in `web/tests/uciParser.test.ts` verifying telemetry parsing.
+- CI pipeline integration compiling and testing `web/` application bundle.
 - WebAssembly C-API bridge in `interface/wasm_api.h` and `interface/wasm_api.cpp` with exported functions (`lookahead_init`, `lookahead_send_command`, `lookahead_set_output_callback`, `lookahead_read_output`, `lookahead_shutdown`).
 - Emscripten WebAssembly build target in `engine/CMakeLists.txt` producing modularized `lookahead.js` and `lookahead.wasm`.
 - GoogleTest suite in `engine/tests/interface/test_wasm_api.cpp` testing C-API handshake, polling queue, tactical search, and clean shutdown (98 tests total).

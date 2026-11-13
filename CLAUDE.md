@@ -1,9 +1,9 @@
 # Lookahead - Project Guide & Rules for AI Agents
 
 ## Current Status
-- **Current Phase**: Phase 8 (Emscripten WebAssembly & React Web Application) - Sub-PR 8.1: Emscripten WASM Build Configuration & C-API Bridge
-- **Active Branch**: `phase-8-wasm-build-api`
-- **Next Step**: Open PR #17, wait for user review & merge, then proceed to Sub-PR 8.2 (Web Worker WASM Controller & Hook)
+- **Current Phase**: Phase 8 (Emscripten WebAssembly & React Web Application) - Sub-PR 8.2: Web Worker WASM Controller & Hook
+- **Active Branch**: `phase-8-web-worker-controller`
+- **Next Step**: Open PR #18, wait for user review & merge, then proceed to Sub-PR 8.3 (Interactive Chessboard UI & Telemetry Panels)
 - **Author**: Alex (`Alex-2006-alt`)
 - **Repository**: `https://github.com/Alex-2006-alt/Lookahead.git`
 - **Default Branch**: `main`
