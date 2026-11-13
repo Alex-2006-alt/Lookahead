@@ -71,7 +71,7 @@ BenchmarkResult run_benchmark(int depth, std::ostream& out, int hash_mb) {
 
         aggregate.total_nodes += res.nodes;
 
-        out << "[" << std::setw(2) << (i + 1) << "/" << suite.size() << "] "
+        out << "[" << std::right << std::setw(2) << (i + 1) << "/" << suite.size() << "] "
             << std::left << std::setw(34) << item.name
             << " | D: " << std::setw(2) << res.depth_reached
             << " | nodes: " << std::setw(8) << res.nodes
@@ -99,3 +99,4 @@ BenchmarkResult run_benchmark(int depth, std::ostream& out, int hash_mb) {
 }
 
 }  // namespace lookahead::search
+

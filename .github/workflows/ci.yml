@@ -64,6 +64,14 @@ jobs:
         run: |
           python tools/test_run_ablation.py
 
+      - name: Run Benchmark Profiler Unit Tests
+        run: |
+          python tools/test_run_bench.py
+
+      - name: Run Engine Search Benchmark
+        run: |
+          python tools/run_bench.py --binary build/lookahead --depth 3
+
   sanitizer-checks:
     name: Clang AddressSanitizer & UBSan
     runs-on: ubuntu-latest
