@@ -44,6 +44,29 @@ if(ENGINE_SOURCES)
         add_executable(lookahead src/main.cpp)
         target_link_libraries(lookahead PRIVATE lookahead_lib)
     endif()
+
+    # WebAssembly target (Emscripten)
+    option(LOOKAHEAD_BUILD_WASM "Build Lookahead WebAssembly Artifacts" OFF)
+    if(EMSCRIPTEN OR LOOKAHEAD_BUILD_WASM)
+        add_executable(lookahead_wasm src/interface/wasm_api.cpp)
+        target_link_libraries(lookahead_wasm PRIVATE lookahead_lib)
+        set_target_properties(lookahead_wasm PROPERTIES
+            OUTPUT_NAME "lookahead"
+            SUFFIX ".js"
+        )
+        target_link_options(lookahead_wasm PRIVATE
+            "-O3"
+            "-sWASM=1"
+            "-sMODULARIZE=1"
+            "-sEXPORT_NAME=LookaheadModule"
+            "-sALLOW_TABLE_GROWTH=1"
+            "-sEXPORTED_FUNCTIONS=['_lookahead_init','_lookahead_send_command','_lookahead_set_output_callback','_lookahead_read_output','_lookahead_shutdown','_malloc','_free']"
+            "-sEXPORTED_RUNTIME_METHODS=['ccall','cwrap','addFunction','removeFunction']"
+            "-sALLOW_MEMORY_GROWTH=1"
+            "-sINITIAL_MEMORY=67108864"
+            "-sENVIRONMENT=web,worker,node"
+        )
+    endif()
 else()
     message(STATUS "Phase 1: Engine sources not yet created. Skeleton configured.")
 endif()
